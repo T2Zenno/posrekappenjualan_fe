@@ -1,7 +1,8 @@
 import React from 'react';
-import { Card } from "@/components/ui/card";
+import { Card } from '@/components/ui/card';
 import { useData } from '@/hooks/useData';
-import { formatCurrency, formatDate } from '@/utils/formatters';
+import { formatCurrency } from '@/utils/formatters';
+import { Package, DollarSign, TrendingUp, Route } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const { sales, customers, products, channels, payments, admins } = useData();
@@ -65,7 +66,7 @@ const Dashboard: React.FC = () => {
           <div className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center">
-                <span className="text-2xl">📦</span>
+                <Package className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
                 <p className="text-muted-foreground text-sm">Total Order</p>
@@ -79,7 +80,7 @@ const Dashboard: React.FC = () => {
           <div className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-accent flex items-center justify-center">
-                <span className="text-2xl">💰</span>
+                <DollarSign className="w-6 h-6 text-accent-foreground" />
               </div>
               <div>
                 <p className="text-muted-foreground text-sm">Pendapatan</p>
@@ -93,7 +94,7 @@ const Dashboard: React.FC = () => {
           <div className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-success/20 flex items-center justify-center">
-                <span className="text-2xl">📈</span>
+                <TrendingUp className="w-6 h-6 text-success" />
               </div>
               <div>
                 <p className="text-muted-foreground text-sm">Rata-rata Order</p>
@@ -107,7 +108,7 @@ const Dashboard: React.FC = () => {
           <div className="p-6">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center">
-                <span className="text-2xl">🛣️</span>
+                <Route className="w-6 h-6 text-warning" />
               </div>
               <div>
                 <p className="text-muted-foreground text-sm">Channel Teratas</p>
@@ -136,7 +137,7 @@ const Dashboard: React.FC = () => {
                 <tbody>
                   {dailyStats.map((stat, index) => (
                     <tr key={stat.date} className="border-b border-border/30 hover:bg-accent/20">
-                      <td className="py-3 text-sm">{formatDate(stat.date)}</td>
+                      <td className="py-3 text-sm">{stat.date}</td>
                       <td className="py-3 text-sm text-right">{stat.orders}</td>
                       <td className="py-3 text-sm text-right font-medium">
                         {formatCurrency(stat.revenue)}

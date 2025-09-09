@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { useState, useEffect } from "react";
+import { Store } from "lucide-react";
 import LoginForm from "@/components/LoginForm";
 import POSApp from "@/components/POSApp";
 import NotFound from "./pages/NotFound";
@@ -35,7 +36,7 @@ const App = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-surface">
         <div className="text-center">
           <div className="w-16 h-16 rounded-2xl bg-gradient-primary mb-4 mx-auto flex items-center justify-center animate-pulse">
-            <span className="text-2xl">🏪</span>
+            <Store className="w-8 h-8 text-primary-foreground" />
           </div>
           <p className="text-muted-foreground">Memuat...</p>
         </div>

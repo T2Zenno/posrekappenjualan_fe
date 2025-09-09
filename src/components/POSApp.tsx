@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useData } from '@/hooks/useData';
-import { Sun, Moon, Zap, Download, Upload, RotateCcw } from 'lucide-react';
-import { toast } from "sonner";
-
-// Import components (will be created next)
+import { Store, ShoppingCart, Users, Package, Route, CreditCard, Settings, Zap, Download, Upload, RotateCcw, Sun, Moon, LogOut, BarChart3, FileText } from 'lucide-react';
+import { toast } from 'sonner';
 import Dashboard from './Dashboard';
 import SalesManager from './SalesManager';
 import CustomerManager from './CustomerManager';
@@ -70,14 +68,14 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
   };
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'penjualan', label: 'Penjualan', icon: '🛒' },
-    { id: 'pelanggan', label: 'Pelanggan', icon: '👥' },
-    { id: 'produk', label: 'Produk', icon: '📦' },
-    { id: 'channel', label: 'Channel', icon: '🛣️' },
-    { id: 'pembayaran', label: 'Metode Bayar', icon: '💳' },
-    { id: 'admin', label: 'Admin', icon: '⚙️' },
-    { id: 'laporan', label: 'Laporan', icon: '📋' }
+    { id: 'dashboard', label: 'Dashboard', component: BarChart3 },
+    { id: 'penjualan', label: 'Penjualan', component: ShoppingCart },
+    { id: 'pelanggan', label: 'Pelanggan', component: Users },
+    { id: 'produk', label: 'Produk', component: Package },
+    { id: 'channel', label: 'Channel', component: Route },
+    { id: 'pembayaran', label: 'Metode Bayar', component: CreditCard },
+    { id: 'admin', label: 'Admin', component: Settings },
+    { id: 'laporan', label: 'Laporan', component: FileText }
   ] as const;
 
   return (
@@ -88,7 +86,7 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
           <div className="flex items-center gap-4 py-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
-                <span className="text-xl">🏪</span>
+                <Store className="w-5 h-5 text-primary-foreground" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gradient">POS & Rekap Penjualan</h1>
@@ -97,19 +95,22 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
           </div>
           
           {/* Navigation */}
-          <nav className="flex flex-wrap gap-2 pb-4 overflow-x-auto">
-            {tabs.map((tab) => (
-              <Button
-                key={tab.id}
-                variant={activeTab === tab.id ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab(tab.id as ActiveTab)}
-                className="flex-shrink-0"
-              >
-                <span className="mr-1">{tab.icon}</span>
-                {tab.label}
-              </Button>
-            ))}
+          <nav className="flex gap-2 overflow-x-auto">
+            {tabs.map((tab) => {
+              const IconComponent = tab.component;
+              return (
+                <Button
+                  key={tab.id}
+                  variant={activeTab === tab.id ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setActiveTab(tab.id as ActiveTab)}
+                  className="whitespace-nowrap"
+                >
+                  <IconComponent className="w-4 h-4 mr-2" />
+                  {tab.label}
+                </Button>
+              );
+            })}
             
             <div className="flex-1" />
             

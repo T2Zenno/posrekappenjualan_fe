@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useData } from '@/hooks/useData';
 import { formatCurrency, formatDate, parseDate, isDateBetween } from '@/utils/formatters';
-import { Download } from 'lucide-react';
+import { Download, Package, DollarSign, TrendingUp, FileText } from 'lucide-react';
 
 const Reports: React.FC = () => {
   const { sales, customers, products, channels, payments, admins } = useData();
@@ -164,7 +164,7 @@ const Reports: React.FC = () => {
             <Card className="glass">
               <div className="p-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">📦</span>
+                  <Package className="w-6 h-6 text-primary" />
                   <div>
                     <p className="text-muted-foreground text-sm">Total Order</p>
                     <p className="text-xl font-bold">{stats.totalOrders.toLocaleString()}</p>
@@ -176,7 +176,7 @@ const Reports: React.FC = () => {
             <Card className="glass">
               <div className="p-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">💰</span>
+                  <DollarSign className="w-6 h-6 text-accent" />
                   <div>
                     <p className="text-muted-foreground text-sm">Pendapatan</p>
                     <p className="text-xl font-bold">{formatCurrency(stats.totalRevenue)}</p>
@@ -188,7 +188,7 @@ const Reports: React.FC = () => {
             <Card className="glass">
               <div className="p-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">📈</span>
+                  <TrendingUp className="w-6 h-6 text-success" />
                   <div>
                     <p className="text-muted-foreground text-sm">Rata-rata Order</p>
                     <p className="text-xl font-bold">{formatCurrency(stats.averageOrderValue)}</p>
@@ -200,7 +200,7 @@ const Reports: React.FC = () => {
             <Card className="glass">
               <div className="p-4">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">🧾</span>
+                  <FileText className="w-6 h-6 text-muted-foreground" />
                   <div>
                     <p className="text-muted-foreground text-sm">Periode</p>
                     <p className="text-sm font-bold">{formatPeriod()}</p>

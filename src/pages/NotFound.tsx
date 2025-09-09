@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
 const NotFound = () => {
   const location = useLocation();
@@ -13,7 +14,7 @@ const NotFound = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-surface">
       <div className="text-center">
         <div className="w-16 h-16 rounded-2xl bg-gradient-primary mb-6 mx-auto flex items-center justify-center">
-          <span className="text-2xl">🔍</span>
+          <Search className="w-8 h-8 text-primary-foreground" />
         </div>
         <h1 className="text-4xl font-bold mb-4">404</h1>
         <p className="text-xl text-muted-foreground mb-6">Oops! Halaman tidak ditemukan</p>
