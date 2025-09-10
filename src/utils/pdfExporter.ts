@@ -1,13 +1,6 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { formatCurrency, formatDate } from './formatters';
-
-// Extend jsPDF type to include autoTable
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF;
-  }
-}
 
 // Use the types from useData.ts
 import type { Sale, Customer, Product, Channel, Payment, Admin } from '@/hooks/useData';
@@ -79,7 +72,7 @@ export const exportToPDF = (data: ExportData) => {
       ];
     });
     
-    doc.autoTable({
+    autoTable(doc, {
       startY: yPosition,
       head: [['Tanggal', 'Pelanggan', 'Produk', 'Channel', 'Harga', 'Pembayaran', 'Admin']],
       body: salesTableData,
@@ -133,7 +126,7 @@ export const exportToPDF = (data: ExportData) => {
       formatCurrency(stats.revenue)
     ]);
     
-    doc.autoTable({
+    autoTable(doc, {
       startY: yPosition,
       head: [['Channel', 'Total Order', 'Total Pendapatan']],
       body: channelTableData,
