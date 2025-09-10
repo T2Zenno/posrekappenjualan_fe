@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useData } from '@/hooks/useData';
-import { Store, ShoppingCart, Users, Package, Route, CreditCard, Settings, Zap, Download, Upload, RotateCcw, Sun, Moon, LogOut, BarChart3, FileText } from 'lucide-react';
+import { Store, ShoppingCart, Users, Package, Route, CreditCard, Settings, Zap, Download, RotateCcw, Sun, Moon, LogOut, BarChart3, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import Dashboard from './Dashboard';
 import SalesManager from './SalesManager';
@@ -22,7 +22,7 @@ interface POSAppProps {
 const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const { theme, toggleTheme } = useTheme();
-  const { loadDemoData, resetAllData, exportData, importData } = useData();
+  const { loadDemoData, resetAllData, exportData } = useData();
 
   const handleDemoLoad = () => {
     loadDemoData();
@@ -41,23 +41,6 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
     toast.success('Data berhasil diekspor!');
   };
 
-  const handleImport = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        try {
-          await importData(file);
-          toast.success('Data berhasil diimpor!');
-        } catch {
-          toast.error('File tidak valid atau terjadi kesalahan.');
-        }
-      }
-    };
-    input.click();
-  };
 
   const handleLogout = () => {
     if (window.confirm('Yakin ingin logout?')) {
@@ -94,67 +77,71 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
             </div>
           </div>
           
-          {/* Navigation */}
-          <nav className="flex gap-2 overflow-x-auto">
-            {tabs.map((tab) => {
-              const IconComponent = tab.component;
-              return (
-                <Button
-                  key={tab.id}
-                  variant={activeTab === tab.id ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setActiveTab(tab.id as ActiveTab)}
-                  className="whitespace-nowrap"
-                >
-                  <IconComponent className="w-4 h-4 mr-2" />
-                  {tab.label}
+          {/* Navigation - Mobile Responsive */}
+          <nav className="flex flex-col gap-4">
+            {/* Navigation Tabs */}
+            <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
+              {tabs.map((tab) => {
+                const IconComponent = tab.component;
+                return (
+                  <Button
+                    key={tab.id}
+                    variant={activeTab === tab.id ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setActiveTab(tab.id as ActiveTab)}
+                    className="whitespace-nowrap min-w-fit flex-shrink-0"
+                  >
+                    <IconComponent className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </Button>
+                );
+              })}
+            </div>
+            
+            {/* Toolbar - Mobile Responsive */}
+            <div className="flex gap-2 justify-between items-center">
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={handleDemoLoad} title="Muat data contoh">
+                  <Zap className="h-4 w-4" />
+                  <span className="hidden md:inline ml-2">Demo</span>
                 </Button>
-              );
-            })}
-            
-            <div className="flex-1" />
-            
-            {/* Toolbar */}
-            <div className="flex gap-2 flex-wrap">
-              <Button variant="outline" size="sm" onClick={handleDemoLoad} title="Muat data contoh">
-                <Zap className="h-4 w-4" />
-                <span className="hidden sm:inline">Demo</span>
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleExport} title="Ekspor semua data">
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Ekspor</span>
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleImport} title="Impor data dari JSON">
-                <Upload className="h-4 w-4" />
-                <span className="hidden sm:inline">Impor</span>
-              </Button>
-              <Button variant="destructive" size="sm" onClick={handleReset} title="Hapus semua data">
-                <RotateCcw className="h-4 w-4" />
-                <span className="hidden sm:inline">Reset</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleTheme}
-                title="Toggle tema"
-              >
-                {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-                title="Logout"
-              >
-                Logout
-              </Button>
+                <Button variant="outline" size="sm" onClick={handleExport} title="Ekspor semua data">
+                  <Download className="h-4 w-4" />
+                  <span className="hidden md:inline ml-2">Ekspor</span>
+                </Button>
+                <Button variant="destructive" size="sm" onClick={handleReset} title="Hapus semua data">
+                  <RotateCcw className="h-4 w-4" />
+                  <span className="hidden md:inline ml-2">Reset</span>
+                </Button>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleTheme}
+                  title="Toggle tema"
+                >
+                  {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  title="Logout"
+                  className="text-xs sm:text-sm"
+                >
+                  <LogOut className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Logout</span>
+                </Button>
+              </div>
             </div>
           </nav>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-8">
         {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'penjualan' && <SalesManager />}
         {activeTab === 'pelanggan' && <CustomerManager />}

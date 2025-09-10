@@ -97,8 +97,20 @@ const Reports: React.FC = () => {
     return admin?.name || '-';
   });
 
-  const handlePrint = () => {
-    window.print();
+  const handleExportPDF = () => {
+    const exportData = {
+      sales: filteredSales,
+      customers,
+      products,
+      channels,
+      payments,
+      admins
+    };
+    
+    // Import the PDF exporter function
+    import('@/utils/pdfExporter').then(({ exportToPDF }) => {
+      exportToPDF(exportData);
+    });
   };
 
   const formatPeriod = () => {
@@ -145,8 +157,8 @@ const Reports: React.FC = () => {
                 </>
               )}
               
-              <Button variant="warning" onClick={handlePrint}>
-                <Download className="h-4 w-4" />
+              <Button variant="default" onClick={handleExportPDF}>
+                <Download className="h-4 w-4 mr-2" />
                 Download PDF
               </Button>
             </div>
@@ -160,7 +172,7 @@ const Reports: React.FC = () => {
           </div>
 
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <Card className="glass">
               <div className="p-4">
                 <div className="flex items-center gap-3">
@@ -211,7 +223,7 @@ const Reports: React.FC = () => {
           </div>
 
           {/* Analysis Tables */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
             {/* By Channel */}
             <Card className="glass">
               <div className="p-4">

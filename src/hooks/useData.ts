@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
+import { getTodayString } from '@/utils/formatters';
+import { exportToPDF } from '@/utils/pdfExporter';
+import { toast } from 'sonner';
 
 // Data types
 export interface Customer {
@@ -353,67 +356,21 @@ export const useData = () => {
     setSales([]);
   }, []);
 
-  // Export data
+  // Export data as PDF
   const exportData = useCallback(() => {
     const data = {
+      sales,
       customers,
       products,
       channels,
       payments,
-      admins,
-      sales
+      admins
     };
     
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'pos-data.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [customers, products, channels, payments, admins, sales]);
+    exportToPDF(data);
+    toast.success('Laporan PDF berhasil diunduh!');
+  }, [sales, customers, products, channels, payments, admins]);
 
-  // Import data
-  const importData = useCallback((file: File) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = JSON.parse(e.target?.result as string);
-          
-          if (data.customers) {
-            setCustomers(data.customers);
-            save(KEYS.customers, data.customers);
-          }
-          if (data.products) {
-            setProducts(data.products);
-            save(KEYS.products, data.products);
-          }
-          if (data.channels) {
-            setChannels(data.channels);
-            save(KEYS.channels, data.channels);
-          }
-          if (data.payments) {
-            setPayments(data.payments);
-            save(KEYS.payments, data.payments);
-          }
-          if (data.admins) {
-            setAdmins(data.admins);
-            save(KEYS.admins, data.admins);
-          }
-          if (data.sales) {
-            setSales(data.sales);
-            save(KEYS.sales, data.sales);
-          }
-          
-          resolve(true);
-        } catch (error) {
-          reject(error);
-        }
-      };
-      reader.readAsText(file);
-    });
-  }, []);
 
   return {
     // Data
@@ -457,7 +414,6 @@ export const useData = () => {
     // Utility operations
     loadDemoData,
     resetAllData,
-    exportData,
-    importData
+    exportData
   };
 };
