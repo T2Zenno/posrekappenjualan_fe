@@ -68,17 +68,15 @@ export interface SaleInput {
 // Base API URL
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
-// Get auth token
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('pos-token');
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
+  // Removed token usage as Sanctum is no longer used
+  return {};
 };
 
 // Fetch CSRF cookie
 const fetchCsrfCookie = async () => {
-  await fetch('http://localhost:8000/sanctum/csrf-cookie', {
-    credentials: 'include',
-  });
+  // Removed Sanctum CSRF cookie fetch as Sanctum is no longer used
+  return;
 };
 
 // Fetch functions for React Query

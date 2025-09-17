@@ -34,27 +34,7 @@ const Settings: React.FC<SettingsProps> = ({ onLogout, onExport }) => {
         <p className="text-muted-foreground">Kelola preferensi dan data aplikasi</p>
       </div>
 
-      {/* Theme Settings */}
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20 dark:border-gray-700/20">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Sun className="w-5 h-5" />
-          Tema Aplikasi
-        </h2>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-medium">Mode Tema</p>
-            <p className="text-sm text-muted-foreground">Pilih antara tema terang atau gelap</p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={toggleTheme}
-            className="flex items-center gap-2 hover:bg-primary/10"
-          >
-            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-            {theme === 'light' ? 'Gelap' : 'Terang'}
-          </Button>
-        </div>
-      </div>
+      
 
       {/* Export Settings */}
       <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20 dark:border-gray-700/20">

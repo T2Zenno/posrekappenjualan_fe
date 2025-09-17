@@ -14,6 +14,7 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [ingatSaya, setIngatSaya] = useState(false);
   const [loading, setLoading] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
@@ -22,40 +23,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      // Call CSRF cookie endpoint before login
-      await fetch('http://localhost:8000/sanctum/csrf-cookie', {
-        credentials: 'include',
-      });
-
-      // Get CSRF token from cookie
-      const getCookie = (name: string) => {
-        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-        return match ? decodeURIComponent(match[2]) : null;
-      };
-
-      const xsrfToken = getCookie('XSRF-TOKEN');
-
-      const response = await fetch('http://localhost:8000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(xsrfToken && { 'X-XSRF-TOKEN': xsrfToken }),
-        },
-        credentials: 'include',
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        localStorage.setItem('pos-authenticated', 'true');
-        localStorage.setItem('pos-token', data.data.token);
-        onLogin(true);
-        toast.success('Login berhasil! Selamat datang di POS System');
+      // Since APIs are now public, skip backend login and directly authenticate
+      localStorage.setItem('pos-authenticated', 'true');
+      if (ingatSaya) {
+        localStorage.setItem('pos-remember', 'true');
       } else {
-        toast.error(data.message || 'Login gagal!');
+        localStorage.removeItem('pos-remember');
       }
-    } catch (error) {
+      onLogin(true);
+      toast.success('Login berhasil! Selamat datang di POS System');
+    } catch (error: any) {
       toast.error('Terjadi kesalahan saat login');
     } finally {
       setLoading(false);
@@ -112,6 +89,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
                 required
                 className="glass"
               />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                id="ingatSaya"
+                type="checkbox"
+                checked={ingatSaya}
+                onChange={(e) => setIngatSaya(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <Label htmlFor="ingatSaya" className="select-none">Ingat Saya</Label>
             </div>
 
             <Button

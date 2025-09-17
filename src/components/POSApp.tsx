@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useData } from '@/hooks/useData';
-import { Store, ShoppingCart, Users, Package, Route, CreditCard, Settings, BarChart3, FileText, Cog } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Store, ShoppingCart, Users, Package, Route, CreditCard, Users2, BarChart3, FileText, Cog, Sun, Moon } from 'lucide-react';
 import { toast } from 'sonner';
 import Dashboard from './Dashboard';
 import SalesManager from './SalesManager';
@@ -22,6 +23,7 @@ interface POSAppProps {
 const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const { exportData } = useData();
+  const { theme, toggleTheme } = useTheme();
 
   const handleExport = (options?: { sections?: string[] }) => {
     exportData(options);
@@ -43,7 +45,7 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
     { id: 'produk', label: 'Produk', component: Package },
     { id: 'channel', label: 'Channel', component: Route },
     { id: 'pembayaran', label: 'Metode Bayar', component: CreditCard },
-    { id: 'admin', label: 'Admin', component: Settings },
+    { id: 'admin', label: 'Admin', component: Users2 },
     { id: 'laporan', label: 'Laporan', component: FileText },
     { id: 'settings', label: 'Pengaturan', component: Cog }
   ] as const;
@@ -61,6 +63,19 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
               <div>
                 <h1 className="text-xl font-bold text-gradient">POS & Rekap Penjualan</h1>
               </div>
+            </div>
+            <div className="ml-auto">
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full hover:bg-primary/20 transition-colors"
+                aria-label="Ganti Tema"
+              >
+                {theme === 'light' ? (
+                  <Moon className="w-5 h-5 text-primary-foreground" />
+                ) : (
+                  <Sun className="w-5 h-5 text-primary-foreground" />
+                )}
+              </button>
             </div>
           </div>
 
