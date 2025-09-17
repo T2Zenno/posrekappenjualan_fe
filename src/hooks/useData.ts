@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getTodayString } from '@/utils/formatters';
-import { exportToPDF } from '@/utils/pdfExporter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { toast } from 'sonner';
 
 // Data types
@@ -41,379 +40,626 @@ export interface Admin {
 
 export interface Sale {
   id: string;
-  customer: string;
-  product: string;
-  channel: string;
-  payment: string;
-  admin: string;
+  customer: { id: string; name: string; username: string; note: string };
+  product: { id: string; name: string; type: string; sku: string };
+  channel: { id: string; name: string; desc: string; url: string };
+  payment: { id: string; name: string; desc: string; code: string };
+  admin: { id: string; name: string; username: string; note: string };
   price: number;
   link: string;
   date: string;
-  shipDate: string;
+  ship_date: string;
   note: string;
 }
 
-// Storage keys
-const KEYS = {
-  customers: 'pos_customers',
-  products: 'pos_products',
-  channels: 'pos_channels',
-  payments: 'pos_payments',
-  admins: 'pos_admins',
-  sales: 'pos_sales'
-} as const;
+export interface SaleInput {
+  customer_id: string;
+  product_id: string;
+  channel_id: string;
+  payment_id: string;
+  admin_id: string;
+  price: number;
+  link: string;
+  date: string;
+  ship_date: string;
+  note: string;
+}
 
-// Utility functions
-const load = <T>(key: string, defaultValue: T[] = []): T[] => {
-  try {
-    const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : defaultValue;
-  } catch {
-    return defaultValue;
-  }
+// Base API URL
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+
+// Get auth token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('pos-token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
-const save = <T>(key: string, data: T[]) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (error) {
-    console.error('Failed to save data:', error);
-  }
+// Fetch CSRF cookie
+const fetchCsrfCookie = async () => {
+  await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+    credentials: 'include',
+  });
 };
 
-const generateId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+// Fetch functions for React Query
+const fetchCustomers = async (): Promise<Customer[]> => {
+  const res = await fetch(`${API_BASE}/customers`, {
+    headers: getAuthHeaders(),
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Failed to fetch customers');
+  return res.json();
+};
+
+const fetchProducts = async (): Promise<Product[]> => {
+  const res = await fetch(`${API_BASE}/products`, {
+    headers: getAuthHeaders(),
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Failed to fetch products');
+  return res.json();
+};
+
+const fetchChannels = async (): Promise<Channel[]> => {
+  const res = await fetch(`${API_BASE}/channels`, {
+    headers: getAuthHeaders(),
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Failed to fetch channels');
+  return res.json();
+};
+
+const fetchPayments = async (): Promise<Payment[]> => {
+  const res = await fetch(`${API_BASE}/payments`, {
+    headers: getAuthHeaders(),
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Failed to fetch payments');
+  return res.json();
+};
+
+const fetchAdmins = async (): Promise<Admin[]> => {
+  const res = await fetch(`${API_BASE}/admins`, {
+    headers: getAuthHeaders(),
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Failed to fetch admins');
+  return res.json();
+};
+
+const fetchSales = async (): Promise<Sale[]> => {
+  const res = await fetch(`${API_BASE}/sales`, {
+    headers: getAuthHeaders(),
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Failed to fetch sales');
+  return res.json();
+};
 
 // Custom hook for data management
 export const useData = () => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [channels, setChannels] = useState<Channel[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [admins, setAdmins] = useState<Admin[]>([]);
-  const [sales, setSales] = useState<Sale[]>([]);
+  const queryClient = useQueryClient();
 
-  // Load data from localStorage on mount
-  useEffect(() => {
-    setCustomers(load(KEYS.customers));
-    setProducts(load(KEYS.products));
-    setChannels(load(KEYS.channels));
-    setPayments(load(KEYS.payments));
-    setAdmins(load(KEYS.admins));
-    setSales(load(KEYS.sales));
-  }, []);
+  // Queries
+  const customersQuery = useQuery({
+    queryKey: ['customers'],
+    queryFn: fetchCustomers,
+  });
 
-  // Initialize with default data if empty
-  useEffect(() => {
-    if (payments.length === 0) {
-      const defaultPayment: Payment = {
-        id: generateId(),
-        name: 'Transfer Bank',
-        desc: '',
-        code: 'TRF'
-      };
-      setPayments([defaultPayment]);
-      save(KEYS.payments, [defaultPayment]);
-    }
+  const productsQuery = useQuery({
+    queryKey: ['products'],
+    queryFn: fetchProducts,
+  });
 
-    if (channels.length === 0) {
-      const defaultChannel: Channel = {
-        id: generateId(),
-        name: 'WhatsApp',
-        desc: '',
-        url: ''
-      };
-      setChannels([defaultChannel]);
-      save(KEYS.channels, [defaultChannel]);
-    }
+  const channelsQuery = useQuery({
+    queryKey: ['channels'],
+    queryFn: fetchChannels,
+  });
 
-    if (admins.length === 0) {
-      const defaultAdmin: Admin = {
-        id: generateId(),
-        name: 'Administrator',
-        username: '',
-        note: ''
-      };
-      setAdmins([defaultAdmin]);
-      save(KEYS.admins, [defaultAdmin]);
-    }
-  }, [payments.length, channels.length, admins.length]);
+  const paymentsQuery = useQuery({
+    queryKey: ['payments'],
+    queryFn: fetchPayments,
+  });
 
-  // CRUD operations
-  const addCustomer = useCallback((customer: Omit<Customer, 'id'>) => {
-    const newCustomer: Customer = { ...customer, id: generateId() };
-    const updated = [...customers, newCustomer];
-    setCustomers(updated);
-    save(KEYS.customers, updated);
-    return newCustomer;
-  }, [customers]);
+  const adminsQuery = useQuery({
+    queryKey: ['admins'],
+    queryFn: fetchAdmins,
+  });
 
-  const updateCustomer = useCallback((id: string, customer: Omit<Customer, 'id'>) => {
-    const updated = customers.map(c => c.id === id ? { ...customer, id } : c);
-    setCustomers(updated);
-    save(KEYS.customers, updated);
-  }, [customers]);
+  const salesQuery = useQuery({
+    queryKey: ['sales'],
+    queryFn: fetchSales,
+  });
 
-  const deleteCustomer = useCallback((id: string) => {
-    const updated = customers.filter(c => c.id !== id);
-    setCustomers(updated);
-    save(KEYS.customers, updated);
-  }, [customers]);
+  // CRUD operations for Product using useMutation
+  const addProductMutation = useMutation({
+    mutationFn: async (product: Omit<Product, 'id'>) => {
+      const res = await fetch(`${API_BASE}/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(product),
+      });
+      if (!res.ok) throw new Error('Failed to add product');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Produk berhasil ditambahkan');
+    },
+    onError: () => {
+      toast.error('Gagal menambahkan produk');
+    },
+  });
 
-  const addProduct = useCallback((product: Omit<Product, 'id'>) => {
-    const newProduct: Product = { ...product, id: generateId() };
-    const updated = [...products, newProduct];
-    setProducts(updated);
-    save(KEYS.products, updated);
-    return newProduct;
-  }, [products]);
-
-  const updateProduct = useCallback((id: string, product: Omit<Product, 'id'>) => {
-    const updated = products.map(p => p.id === id ? { ...product, id } : p);
-    setProducts(updated);
-    save(KEYS.products, updated);
-  }, [products]);
-
-  const deleteProduct = useCallback((id: string) => {
-    const updated = products.filter(p => p.id !== id);
-    setProducts(updated);
-    save(KEYS.products, updated);
-  }, [products]);
-
-  const addChannel = useCallback((channel: Omit<Channel, 'id'>) => {
-    const newChannel: Channel = { ...channel, id: generateId() };
-    const updated = [...channels, newChannel];
-    setChannels(updated);
-    save(KEYS.channels, updated);
-    return newChannel;
-  }, [channels]);
-
-  const updateChannel = useCallback((id: string, channel: Omit<Channel, 'id'>) => {
-    const updated = channels.map(c => c.id === id ? { ...channel, id } : c);
-    setChannels(updated);
-    save(KEYS.channels, updated);
-  }, [channels]);
-
-  const deleteChannel = useCallback((id: string) => {
-    const updated = channels.filter(c => c.id !== id);
-    setChannels(updated);
-    save(KEYS.channels, updated);
-  }, [channels]);
-
-  const addPayment = useCallback((payment: Omit<Payment, 'id'>) => {
-    const newPayment: Payment = { ...payment, id: generateId() };
-    const updated = [...payments, newPayment];
-    setPayments(updated);
-    save(KEYS.payments, updated);
-    return newPayment;
-  }, [payments]);
-
-  const updatePayment = useCallback((id: string, payment: Omit<Payment, 'id'>) => {
-    const updated = payments.map(p => p.id === id ? { ...payment, id } : p);
-    setPayments(updated);
-    save(KEYS.payments, updated);
-  }, [payments]);
-
-  const deletePayment = useCallback((id: string) => {
-    const updated = payments.filter(p => p.id !== id);
-    setPayments(updated);
-    save(KEYS.payments, updated);
-  }, [payments]);
-
-  const addAdmin = useCallback((admin: Omit<Admin, 'id'>) => {
-    const newAdmin: Admin = { ...admin, id: generateId() };
-    const updated = [...admins, newAdmin];
-    setAdmins(updated);
-    save(KEYS.admins, updated);
-    return newAdmin;
-  }, [admins]);
-
-  const updateAdmin = useCallback((id: string, admin: Omit<Admin, 'id'>) => {
-    const updated = admins.map(a => a.id === id ? { ...admin, id } : a);
-    setAdmins(updated);
-    save(KEYS.admins, updated);
-  }, [admins]);
-
-  const deleteAdmin = useCallback((id: string) => {
-    const updated = admins.filter(a => a.id !== id);
-    setAdmins(updated);
-    save(KEYS.admins, updated);
-  }, [admins]);
-
-  const addSale = useCallback((sale: Omit<Sale, 'id'>) => {
-    const newSale: Sale = { ...sale, id: generateId() };
-    const updated = [...sales, newSale];
-    setSales(updated);
-    save(KEYS.sales, updated);
-    return newSale;
-  }, [sales]);
-
-  const updateSale = useCallback((id: string, sale: Omit<Sale, 'id'>) => {
-    const updated = sales.map(s => s.id === id ? { ...sale, id } : s);
-    setSales(updated);
-    save(KEYS.sales, updated);
-  }, [sales]);
-
-  const deleteSale = useCallback((id: string) => {
-    const updated = sales.filter(s => s.id !== id);
-    setSales(updated);
-    save(KEYS.sales, updated);
-  }, [sales]);
-
-  // Demo data loader
-  const loadDemoData = useCallback(() => {
-    const now = new Date();
-    const day = (offset: number) => 
-      new Date(now.getFullYear(), now.getMonth(), now.getDate() - offset)
-        .toISOString().slice(0, 10);
-
-    const demoCustomers: Customer[] = [
-      { id: generateId(), name: 'Budi Santoso', username: 'budi_s', note: '' },
-      { id: generateId(), name: 'Siti Aminah', username: 'siti_aminah', note: '' },
-      { id: generateId(), name: 'Andi Wijaya', username: 'andiw', note: '' }
-    ];
-
-    const demoProducts: Product[] = [
-      { id: generateId(), name: 'Kaos Polos', type: 'Fashion', sku: 'TS-PLS' },
-      { id: generateId(), name: 'Botol Minum', type: 'Aksesori', sku: 'BOT-01' },
-      { id: generateId(), name: 'Notebook A5', type: 'ATK', sku: 'NB-A5' }
-    ];
-
-    const demoChannels: Channel[] = [
-      { id: generateId(), name: 'WhatsApp', desc: 'Chat WA', url: '' },
-      { id: generateId(), name: 'TikTok Shop', desc: 'Marketplace TT', url: '' },
-      { id: generateId(), name: 'Instagram', desc: 'DM IG', url: '' }
-    ];
-
-    const updatedCustomers = [...customers, ...demoCustomers];
-    const updatedProducts = [...products, ...demoProducts];
-    const updatedChannels = [...channels, ...demoChannels];
-
-    setCustomers(updatedCustomers);
-    setProducts(updatedProducts);
-    setChannels(updatedChannels);
-
-    save(KEYS.customers, updatedCustomers);
-    save(KEYS.products, updatedProducts);
-    save(KEYS.channels, updatedChannels);
-
-    const demoSales: Sale[] = [
-      {
-        id: generateId(),
-        customer: demoCustomers[0].id,
-        product: demoProducts[0].id,
-        channel: demoChannels[0].id,
-        payment: payments[0]?.id || '',
-        admin: admins[0]?.id || '',
-        price: 120000,
-        date: day(0),
-        shipDate: '',
-        note: 'Ukuran M',
-        link: ''
-      },
-      {
-        id: generateId(),
-        customer: demoCustomers[1].id,
-        product: demoProducts[1].id,
-        channel: demoChannels[1].id,
-        payment: payments[0]?.id || '',
-        admin: admins[0]?.id || '',
-        price: 85000,
-        date: day(1),
-        shipDate: '',
-        note: 'Warna biru',
-        link: ''
-      },
-      {
-        id: generateId(),
-        customer: demoCustomers[2].id,
-        product: demoProducts[2].id,
-        channel: demoChannels[2].id,
-        payment: payments[0]?.id || '',
-        admin: admins[0]?.id || '',
-        price: 25000,
-        date: day(2),
-        shipDate: '',
-        note: '',
-        link: ''
+  const updateProductMutation = useMutation({
+    mutationFn: async ({ id, product }: { id: string; product: Omit<Product, 'id'> }) => {
+      if (!id) {
+        console.error('ID is undefined for update product');
+        return;
       }
-    ];
+      const res = await fetch(`${API_BASE}/products/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(product),
+      });
+      if (!res.ok) throw new Error('Failed to update product');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Produk berhasil diperbarui');
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui produk');
+    },
+  });
 
-    const updatedSales = [...sales, ...demoSales];
-    setSales(updatedSales);
-    save(KEYS.sales, updatedSales);
-  }, [customers, products, channels, payments, admins, sales]);
+  const deleteProductMutation = useMutation({
+    mutationFn: async (id: string) => {
+      if (!id) {
+        console.error('ID is undefined for delete product');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/products/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete product');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Produk berhasil dihapus');
+    },
+    onError: () => {
+      toast.error('Gagal menghapus produk');
+    },
+  });
 
-  // Reset all data
-  const resetAllData = useCallback(() => {
-    const keys = Object.values(KEYS);
-    keys.forEach(key => localStorage.removeItem(key));
-    
-    setCustomers([]);
-    setProducts([]);
-    setChannels([]);
-    setPayments([]);
-    setAdmins([]);
-    setSales([]);
+  // CRUD operations for Customer using useMutation
+  const addCustomerMutation = useMutation({
+    mutationFn: async (customer: Omit<Customer, 'id'>) => {
+      const res = await fetch(`${API_BASE}/customers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(customer),
+      });
+      if (!res.ok) throw new Error('Failed to add customer');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      toast.success('Pelanggan berhasil ditambahkan');
+    },
+    onError: () => {
+      toast.error('Gagal menambahkan pelanggan');
+    },
+  });
+
+  const updateCustomerMutation = useMutation({
+    mutationFn: async ({ id, customer }: { id: string; customer: Omit<Customer, 'id'> }) => {
+      if (!id) {
+        console.error('ID is undefined for update customer');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/customers/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(customer),
+      });
+      if (!res.ok) throw new Error('Failed to update customer');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      toast.success('Pelanggan berhasil diperbarui');
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui pelanggan');
+    },
+  });
+
+  const deleteCustomerMutation = useMutation({
+    mutationFn: async (id: string) => {
+      if (!id) {
+        console.error('ID is undefined for delete customer');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/customers/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete customer');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      toast.success('Pelanggan berhasil dihapus');
+    },
+    onError: () => {
+      toast.error('Gagal menghapus pelanggan');
+    },
+  });
+
+  // CRUD operations for Channel using useMutation
+  const addChannelMutation = useMutation({
+    mutationFn: async (channel: Omit<Channel, 'id'>) => {
+      const res = await fetch(`${API_BASE}/channels`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(channel),
+      });
+      if (!res.ok) throw new Error('Failed to add channel');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channels'] });
+      toast.success('Channel berhasil ditambahkan');
+    },
+    onError: () => {
+      toast.error('Gagal menambahkan channel');
+    },
+  });
+
+  const updateChannelMutation = useMutation({
+    mutationFn: async ({ id, channel }: { id: string; channel: Omit<Channel, 'id'> }) => {
+      if (!id) {
+        throw new Error('ID is undefined for update channel');
+      }
+      const res = await fetch(`${API_BASE}/channels/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(channel),
+      });
+      if (!res.ok) throw new Error('Failed to update channel');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channels'] });
+      toast.success('Channel berhasil diperbarui');
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui channel');
+    },
+  });
+
+  const deleteChannelMutation = useMutation({
+    mutationFn: async (id: string) => {
+      if (!id) {
+        console.error('ID is undefined for delete channel');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/channels/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete channel');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['channels'] });
+      toast.success('Channel berhasil dihapus');
+    },
+    onError: () => {
+      toast.error('Gagal menghapus channel');
+    },
+  });
+
+  // CRUD operations for Payment using useMutation
+  const addPaymentMutation = useMutation({
+    mutationFn: async (payment: Omit<Payment, 'id'>) => {
+      const res = await fetch(`${API_BASE}/payments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(payment),
+      });
+      if (!res.ok) throw new Error('Failed to add payment');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+      toast.success('Pembayaran berhasil ditambahkan');
+    },
+    onError: () => {
+      toast.error('Gagal menambahkan pembayaran');
+    },
+  });
+
+  const updatePaymentMutation = useMutation({
+    mutationFn: async ({ id, payment }: { id: string; payment: Omit<Payment, 'id'> }) => {
+      if (!id) {
+        console.error('ID is undefined for update payment');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/payments/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(payment),
+      });
+      if (!res.ok) throw new Error('Failed to update payment');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+      toast.success('Pembayaran berhasil diperbarui');
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui pembayaran');
+    },
+  });
+
+  const deletePaymentMutation = useMutation({
+    mutationFn: async (id: string) => {
+      if (!id) {
+        console.error('ID is undefined for delete payment');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/payments/${id}`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete payment');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payments'] });
+      toast.success('Pembayaran berhasil dihapus');
+    },
+    onError: () => {
+      toast.error('Gagal menghapus pembayaran');
+    },
+  });
+
+  // CRUD operations for Admin using useMutation
+  const addAdminMutation = useMutation({
+    mutationFn: async (admin: Omit<Admin, 'id'>) => {
+      const res = await fetch(`${API_BASE}/admins`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(admin),
+      });
+      if (!res.ok) throw new Error('Failed to add admin');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      toast.success('Admin berhasil ditambahkan');
+    },
+    onError: () => {
+      toast.error('Gagal menambahkan admin');
+    },
+  });
+
+  const updateAdminMutation = useMutation({
+    mutationFn: async ({ id, admin }: { id: string; admin: Omit<Admin, 'id'> }) => {
+      if (!id) {
+        console.error('ID is undefined for update admin');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/admins/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(admin),
+      });
+      if (!res.ok) throw new Error('Failed to update admin');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      toast.success('Admin berhasil diperbarui');
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui admin');
+    },
+  });
+
+  const deleteAdminMutation = useMutation({
+    mutationFn: async (id: string) => {
+      if (!id) {
+        console.error('ID is undefined for delete admin');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/admins/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete admin');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      toast.success('Admin berhasil dihapus');
+    },
+    onError: () => {
+      toast.error('Gagal menghapus admin');
+    },
+  });
+
+  // CRUD operations for Sale using useMutation
+  const addSaleMutation = useMutation({
+    mutationFn: async (sale: SaleInput) => {
+      const res = await fetch(`${API_BASE}/sales`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(sale),
+      });
+      if (!res.ok) throw new Error('Failed to add sale');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      toast.success('Penjualan berhasil ditambahkan');
+    },
+    onError: () => {
+      toast.error('Gagal menambahkan penjualan');
+    },
+  });
+
+  const updateSaleMutation = useMutation({
+    mutationFn: async ({ id, sale }: { id: string; sale: SaleInput }) => {
+      if (!id) {
+        console.error('ID is undefined for update sale');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/sales/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+        body: JSON.stringify(sale),
+      });
+      if (!res.ok) throw new Error('Failed to update sale');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      toast.success('Penjualan berhasil diperbarui');
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui penjualan');
+    },
+  });
+
+  const deleteSaleMutation = useMutation({
+    mutationFn: async (id: string) => {
+      if (!id) {
+        console.error('ID is undefined for delete sale');
+        return;
+      }
+      const res = await fetch(`${API_BASE}/sales/${id}`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json', ...getAuthHeaders() },
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to delete sale');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      toast.success('Penjualan berhasil dihapus');
+    },
+    onError: () => {
+      toast.error('Gagal menghapus penjualan');
+    },
+  });
+
+  // Utility operations
+  const loadDemoData = useCallback(() => {
+    toast.error('Load demo data is disabled when connected to backend');
   }, []);
 
-  // Export data as PDF
-  const exportData = useCallback(() => {
-    const data = {
-      sales,
-      customers,
-      products,
-      channels,
-      payments,
-      admins
-    };
-    
-    exportToPDF(data);
-    toast.success('Laporan PDF berhasil diunduh!');
-  }, [sales, customers, products, channels, payments, admins]);
+  const resetAllData = useCallback(() => {
+    toast.error('Reset all data is disabled when connected to backend');
+  }, []);
 
+  const exportData = useCallback(async (options?: { sections?: string[] }) => {
+    const data = {
+      sales: salesQuery.data || [],
+      customers: customersQuery.data || [],
+      products: productsQuery.data || [],
+      channels: channelsQuery.data || [],
+      payments: paymentsQuery.data || [],
+      admins: adminsQuery.data || []
+    };
+
+    try {
+      const { exportToPDF } = await import('@/utils/pdfExporter');
+      exportToPDF(data, {
+        title: 'Laporan Data POS & Rekap Penjualan',
+        sections: options?.sections
+      });
+      toast.success('Laporan PDF berhasil diunduh!');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Gagal mengekspor data');
+    }
+  }, [salesQuery.data, customersQuery.data, productsQuery.data, channelsQuery.data, paymentsQuery.data, adminsQuery.data]);
 
   return {
     // Data
-    customers,
-    products,
-    channels,
-    payments,
-    admins,
-    sales,
-    
+    customers: customersQuery.data || [],
+    products: productsQuery.data || [],
+    channels: channelsQuery.data || [],
+    payments: paymentsQuery.data || [],
+    admins: adminsQuery.data || [],
+    sales: salesQuery.data || [],
+
     // Customer operations
-    addCustomer,
-    updateCustomer,
-    deleteCustomer,
-    
+    addCustomer: addCustomerMutation.mutateAsync,
+    updateCustomer: updateCustomerMutation.mutateAsync,
+    deleteCustomer: deleteCustomerMutation.mutateAsync,
+
     // Product operations
-    addProduct,
-    updateProduct,
-    deleteProduct,
-    
+    addProduct: addProductMutation.mutateAsync,
+    updateProduct: updateProductMutation.mutateAsync,
+    deleteProduct: deleteProductMutation.mutateAsync,
+
     // Channel operations
-    addChannel,
-    updateChannel,
-    deleteChannel,
-    
+    addChannel: addChannelMutation.mutateAsync,
+    updateChannel: updateChannelMutation.mutateAsync,
+    deleteChannel: deleteChannelMutation.mutateAsync,
+
     // Payment operations
-    addPayment,
-    updatePayment,
-    deletePayment,
-    
+    addPayment: addPaymentMutation.mutateAsync,
+    updatePayment: updatePaymentMutation.mutateAsync,
+    deletePayment: deletePaymentMutation.mutateAsync,
+
     // Admin operations
-    addAdmin,
-    updateAdmin,
-    deleteAdmin,
-    
+    addAdmin: addAdminMutation.mutateAsync,
+    updateAdmin: updateAdminMutation.mutateAsync,
+    deleteAdmin: deleteAdminMutation.mutateAsync,
+
     // Sale operations
-    addSale,
-    updateSale,
-    deleteSale,
-    
+    addSale: addSaleMutation.mutateAsync,
+    updateSale: updateSaleMutation.mutateAsync,
+    deleteSale: deleteSaleMutation.mutateAsync,
+
     // Utility operations
     loadDemoData,
     resetAllData,
-    exportData
+    exportData,
+
+    // Fetch functions for refresh
+    fetchCustomers,
+    fetchProducts,
+    fetchChannels,
+    fetchPayments,
+    fetchAdmins,
+    fetchSales,
   };
 };

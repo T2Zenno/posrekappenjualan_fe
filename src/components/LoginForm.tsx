@@ -20,21 +20,46 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simple authentication - in real app, this would be more secure
-    const correctUsername = 'admin';
-    const correctPassword = 'admin123';
-    
-    setTimeout(() => {
-      if (username === correctUsername && password === correctPassword) {
+
+    try {
+      // Call CSRF cookie endpoint before login
+      await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+        credentials: 'include',
+      });
+
+      // Get CSRF token from cookie
+      const getCookie = (name: string) => {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : null;
+      };
+
+      const xsrfToken = getCookie('XSRF-TOKEN');
+
+      const response = await fetch('http://localhost:8000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(xsrfToken && { 'X-XSRF-TOKEN': xsrfToken }),
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
         localStorage.setItem('pos-authenticated', 'true');
+        localStorage.setItem('pos-token', data.data.token);
         onLogin(true);
         toast.success('Login berhasil! Selamat datang di POS System');
       } else {
-        toast.error('Username atau password salah!');
+        toast.error(data.message || 'Login gagal!');
       }
+    } catch (error) {
+      toast.error('Terjadi kesalahan saat login');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -101,8 +126,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground text-center">
               <strong>Demo Login:</strong><br />
-              Username: <code>admin</code><br />
-              Password: <code>admin123</code>
+              Username: <code>testuser</code><br />
+              Password: <code>password</code>
             </p>
           </div>
         </div>

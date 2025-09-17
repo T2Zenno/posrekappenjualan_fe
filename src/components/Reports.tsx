@@ -2,8 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useData } from '@/hooks/useData';
+import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
+import { useData, type Sale } from '@/hooks/useData';
 import { formatCurrency, formatDate, parseDate, isDateBetween } from '@/utils/formatters';
 import { Download, Package, DollarSign, TrendingUp, FileText } from 'lucide-react';
 
@@ -13,6 +13,16 @@ const Reports: React.FC = () => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
+  // Preset options for combobox
+  const presetOptions: ComboboxOption[] = [
+    { value: 'harian', label: 'Harian (hari ini)' },
+    { value: 'mingguan', label: 'Mingguan (minggu ini)' },
+    { value: 'bulanan', label: 'Bulanan (bulan ini)' },
+    { value: 'tahunan', label: 'Tahunan (tahun ini)' },
+    { value: 'alltime', label: 'Semua Waktu' },
+    { value: 'custom', label: 'Custom…' }
+  ];
+
   // Get date range based on preset
   const getDateRange = (presetValue: string) => {
     const now = new Date();
@@ -20,29 +30,41 @@ const Reports: React.FC = () => {
     let to: Date | null = null;
 
     switch (presetValue) {
-      case 'harian':
+      case 'harian': {
         from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        to = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        to = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
         break;
-      case 'mingguan':
+      }
+      case 'mingguan': {
         const day = (now.getDay() + 6) % 7; // Monday = 0
         from = new Date(now);
         from.setDate(now.getDate() - day);
         to = new Date(from);
         to.setDate(from.getDate() + 6);
+        to.setHours(23, 59, 59, 999);
         break;
-      case 'bulanan':
+      }
+      case 'bulanan': {
         from = new Date(now.getFullYear(), now.getMonth(), 1);
-        to = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
         break;
-      case 'tahunan':
+      }
+      case 'tahunan': {
         from = new Date(now.getFullYear(), 0, 1);
-        to = new Date(now.getFullYear(), 11, 31);
+        to = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
         break;
-      case 'custom':
+      }
+      case 'alltime': {
+        from = null;
+        to = null;
+        break;
+      }
+      case 'custom': {
         from = parseDate(dateFrom);
         to = parseDate(dateTo);
+        if (to) to.setHours(23, 59, 59, 999);
         break;
+      }
     }
 
     return { from, to };
@@ -58,44 +80,41 @@ const Reports: React.FC = () => {
     }).sort((a, b) => b.date.localeCompare(a.date));
   }, [sales, from, to]);
 
+  // Helper function to get safe price
+  const getSafePrice = (price: number | string | null | undefined) => {
+    const num = Number(price);
+    return isNaN(num) ? 0 : num;
+  };
+
   // Calculate statistics
   const stats = useMemo(() => {
     const totalOrders = filteredSales.length;
-    const totalRevenue = filteredSales.reduce((sum, sale) => sum + (sale.price || 0), 0);
+    const totalRevenue = filteredSales.reduce((sum, sale) => sum + getSafePrice(sale.price), 0);
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-    
+
     return { totalOrders, totalRevenue, averageOrderValue };
   }, [filteredSales]);
 
   // Aggregate by different dimensions
-  const aggregateBy = (keyFn: (sale: any) => string) => {
+  const aggregateBy = (keyFn: (sale: Sale) => string) => {
     const map = new Map<string, { orders: number; revenue: number }>();
-    
+
     filteredSales.forEach(sale => {
       const key = keyFn(sale);
       const current = map.get(key) || { orders: 0, revenue: 0 };
       current.orders += 1;
-      current.revenue += sale.price || 0;
+      current.revenue += getSafePrice(sale.price);
       map.set(key, current);
     });
-    
+
     return Array.from(map.entries()).map(([name, data]) => ({ name, ...data }));
   };
 
-  const channelStats = aggregateBy(sale => {
-    const channel = channels.find(c => c.id === sale.channel);
-    return channel?.name || '-';
-  });
+  const channelStats = aggregateBy(sale => sale.channel?.name || '-');
 
-  const productStats = aggregateBy(sale => {
-    const product = products.find(p => p.id === sale.product);
-    return product?.name || '-';
-  });
+  const productStats = aggregateBy(sale => sale.product?.name || '-');
 
-  const adminStats = aggregateBy(sale => {
-    const admin = admins.find(a => a.id === sale.admin);
-    return admin?.name || '-';
-  });
+  const adminStats = aggregateBy(sale => sale.admin?.name || '-');
 
   const handleExportPDF = () => {
     const exportData = {
@@ -106,14 +125,18 @@ const Reports: React.FC = () => {
       payments,
       admins
     };
-    
+
     // Import the PDF exporter function
     import('@/utils/pdfExporter').then(({ exportToPDF }) => {
-      exportToPDF(exportData);
+      exportToPDF(exportData, {
+        dateRange: { from, to },
+        title: 'Laporan Rekapan Penjualan'
+      });
     });
   };
 
   const formatPeriod = () => {
+    if (!from && !to) return 'Semua Waktu';
     const fromStr = from ? from.toISOString().slice(0, 10) : 'awal';
     const toStr = to ? to.toISOString().slice(0, 10) : 'akhir';
     return `${fromStr} s/d ${toStr}`;
@@ -125,21 +148,15 @@ const Reports: React.FC = () => {
         <div className="p-6">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
             <h1 className="text-3xl font-bold text-gradient">Rekapan Penjualan</h1>
-            
+
             <div className="flex flex-wrap gap-2 items-center no-print">
-              <Select value={preset} onValueChange={setPreset}>
-                <SelectTrigger className="w-48 glass">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="harian">Harian (hari ini)</SelectItem>
-                  <SelectItem value="mingguan">Mingguan (minggu ini)</SelectItem>
-                  <SelectItem value="bulanan">Bulanan (bulan ini)</SelectItem>
-                  <SelectItem value="tahunan">Tahunan (tahun ini)</SelectItem>
-                  <SelectItem value="custom">Custom…</SelectItem>
-                </SelectContent>
-              </Select>
-              
+              <Combobox
+                options={presetOptions}
+                value={preset}
+                onValueChange={setPreset}
+                className="w-48 glass"
+              />
+
               {preset === 'custom' && (
                 <>
                   <Input
@@ -156,7 +173,7 @@ const Reports: React.FC = () => {
                   />
                 </>
               )}
-              
+
               <Button variant="default" onClick={handleExportPDF}>
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
@@ -342,8 +359,8 @@ const Reports: React.FC = () => {
                       <th className="text-left py-2">Pelanggan</th>
                       <th className="text-left py-2">Produk</th>
                       <th className="text-left py-2">Channel</th>
-                      <th className="text-right py-2">Harga</th>
-                      <th className="text-left py-2">Metode</th>
+                      <th className="text-right py-2 pr-4">Harga</th>
+                      <th className="text-left py-2 pl-4">Metode</th>
                       <th className="text-left py-2">Admin</th>
                       <th className="text-left py-2">Catatan</th>
                     </tr>
@@ -351,11 +368,11 @@ const Reports: React.FC = () => {
                   <tbody>
                     {filteredSales.length > 0 ? (
                       filteredSales.map((sale) => {
-                        const customer = customers.find(c => c.id === sale.customer);
-                        const product = products.find(p => p.id === sale.product);
-                        const channel = channels.find(c => c.id === sale.channel);
-                        const payment = payments.find(p => p.id === sale.payment);
-                        const admin = admins.find(a => a.id === sale.admin);
+                        const customer = customers.find(c => c.id === sale.customer.id);
+                        const product = products.find(p => p.id === sale.product.id);
+                        const channel = channels.find(c => c.id === sale.channel.id);
+                        const payment = payments.find(p => p.id === sale.payment.id);
+                        const admin = admins.find(a => a.id === sale.admin.id);
 
                         return (
                           <tr key={sale.id} className="border-b border-border/30">
@@ -363,8 +380,8 @@ const Reports: React.FC = () => {
                             <td className="py-2">{customer?.name || '-'}</td>
                             <td className="py-2">{product?.name || '-'}</td>
                             <td className="py-2">{channel?.name || '-'}</td>
-                            <td className="py-2 text-right font-medium">{formatCurrency(sale.price)}</td>
-                            <td className="py-2">{payment?.name || '-'}</td>
+                            <td className="py-2 text-right font-medium pr-4">{formatCurrency(sale.price)}</td>
+                            <td className="py-2 pl-4">{payment?.name || '-'}</td>
                             <td className="py-2">{admin?.name || '-'}</td>
                             <td className="py-2 max-w-32 truncate" title={sale.note}>{sale.note || '-'}</td>
                           </tr>

@@ -1,29 +1,56 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { useData } from '@/hooks/useData';
 import { formatCurrency } from '@/utils/formatters';
-import { Package, DollarSign, TrendingUp, Route } from 'lucide-react';
+import { Package, DollarSign, TrendingUp, Route, RefreshCw } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
-  const { sales, customers, products, channels, payments, admins } = useData();
+  const { sales, customers, products, channels, payments, admins, fetchSales } = useData();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchSales();
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, [fetchSales]);
+
+  // Helper function to get safe price
+  const getSafePrice = (price: number | string | null | undefined) => {
+    const num = Number(price);
+    return isNaN(num) ? 0 : num;
+  };
+
+  // Helper function to safely parse date and return ISO string or null
+  const getSafeDateString = (dateStr: string, sliceLength: number = 10) => {
+    try {
+      // Try parsing with T00:00:00
+      let date = new Date(dateStr + 'T00:00:00');
+      if (isNaN(date.getTime())) {
+        // Try parsing as is
+        date = new Date(dateStr);
+        if (isNaN(date.getTime())) return null;
+      }
+      return date.toISOString().slice(0, sliceLength);
+    } catch {
+      return null;
+    }
+  };
 
   // Calculate KPIs
   const totalOrders = sales.length;
-  const totalRevenue = sales.reduce((sum, sale) => sum + (sale.price || 0), 0);
+  const totalRevenue = sales.reduce((sum, sale) => sum + getSafePrice(sale.price), 0);
   const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
   // Get top channel by revenue
   const channelRevenue = sales.reduce((acc, sale) => {
-    acc[sale.channel] = (acc[sale.channel] || 0) + (sale.price || 0);
+    const channelName = sale.channel?.name || 'Unknown';
+    acc[channelName] = (acc[channelName] || 0) + getSafePrice(sale.price);
     return acc;
   }, {} as Record<string, number>);
 
-  const topChannelId = Object.entries(channelRevenue).reduce(
-    (max, [channelId, revenue]) => revenue > max.revenue ? { channelId, revenue } : max,
-    { channelId: '', revenue: -1 }
-  ).channelId;
-
-  const topChannel = channels.find(c => c.id === topChannelId)?.name || '-';
+  const maxIncome = Math.max(...Object.values(channelRevenue));
+  const topChannel = Object.keys(channelRevenue).find(name => channelRevenue[name] === maxIncome) || 'Unknown';
 
   // Last 7 days data
   const now = new Date();
@@ -34,23 +61,29 @@ const Dashboard: React.FC = () => {
   });
 
   const dailyStats = last7Days.map(date => {
-    const daySales = sales.filter(sale => sale.date === date);
+    const daySales = sales.filter(sale => {
+      const saleDate = getSafeDateString(sale.date);
+      return saleDate === date;
+    });
     return {
       date,
       orders: daySales.length,
-      revenue: daySales.reduce((sum, sale) => sum + (sale.price || 0), 0)
+      revenue: daySales.reduce((sum, sale) => sum + getSafePrice(sale.price), 0)
     };
   });
 
   // Current month by channel
   const currentMonth = now.toISOString().slice(0, 7);
-  const monthSales = sales.filter(sale => sale.date.startsWith(currentMonth));
+  const monthSales = sales.filter(sale => {
+    const saleDate = getSafeDateString(sale.date, 7);
+    return saleDate === currentMonth;
+  });
   const channelStats = channels.map(channel => {
-    const channelSales = monthSales.filter(sale => sale.channel === channel.id);
+    const channelSales = monthSales.filter(sale => sale.channel?.id === channel.id);
     return {
       name: channel.name,
       orders: channelSales.length,
-      revenue: channelSales.reduce((sum, sale) => sum + (sale.price || 0), 0)
+      revenue: channelSales.reduce((sum, sale) => sum + getSafePrice(sale.price), 0)
     };
   }).filter(stat => stat.orders > 0);
 
@@ -58,6 +91,14 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gradient">Dashboard Monitoring</h1>
+        <button
+          onClick={fetchSales}
+          className="flex items-center gap-2 bg-gradient-primary text-white px-4 py-2 rounded-md"
+          title="Refresh"
+        >
+          <RefreshCw className="w-5 h-5" />
+          Refresh
+        </button>
       </div>
 
       {/* KPI Cards */}
@@ -107,10 +148,10 @@ const Dashboard: React.FC = () => {
         <Card className="glass">
           <div className="p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center flex-shrink-0">
                 <Route className="w-6 h-6 text-warning" />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-muted-foreground text-sm">Channel Teratas</p>
                 <p className="text-lg font-bold truncate">{topChannel}</p>
               </div>

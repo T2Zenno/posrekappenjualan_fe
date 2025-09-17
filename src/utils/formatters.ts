@@ -28,7 +28,7 @@ export const getTodayString = (): string => {
 export const parseDate = (dateStr: string): Date | null => {
   if (!dateStr) return null;
   try {
-    return new Date(dateStr + 'T00:00:00');
+    return new Date(dateStr);
   } catch {
     return null;
   }

@@ -1,0 +1,493 @@
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
+--
+-- Host: localhost    Database: backend_posrekappenjualan
+-- ------------------------------------------------------
+-- Server version	8.4.3
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `admins`
+--
+
+DROP TABLE IF EXISTS `admins`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `admins` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `username` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `admins`
+--
+
+LOCK TABLES `admins` WRITE;
+/*!40000 ALTER TABLE `admins` DISABLE KEYS */;
+INSERT INTO `admins` VALUES (1,'Sibyl Robel','zboncak.sammy',NULL,'2025-09-11 22:23:23','2025-09-11 22:23:23'),(2,'Prof. Richard Lueilwitz III','schoen.brandyn','Et debitis magnam velit porro praesentium.','2025-09-11 22:23:23','2025-09-11 22:23:23'),(3,'Henry Littel','angel70',NULL,'2025-09-11 22:23:23','2025-09-11 22:23:23'),(4,'Jane Anderson','kuvalis.timmothy',NULL,'2025-09-11 22:23:24','2025-09-11 22:23:24'),(5,'Dr. Garland Hamill DVM','towne.violet',NULL,'2025-09-11 22:23:25','2025-09-11 22:23:25'),(6,'Waldo Auer Jr.','tconroy','Est ea magnam libero pariatur quis autem vero.','2025-09-11 22:23:25','2025-09-11 22:23:25'),(7,'Dr. Jaclyn Fahey','angelo09',NULL,'2025-09-11 22:23:26','2025-09-11 22:23:26'),(8,'Queenie Kshlerin','princess11','Velit velit asperiores voluptas vero optio quod et.','2025-09-11 22:23:26','2025-09-11 22:23:26'),(9,'Claud Rosenbaum','sledner',NULL,'2025-09-11 22:23:27','2025-09-11 22:23:27'),(10,'Dejah Jones','kenna24','Id consequatur ducimus eligendi est ipsum quae.','2025-09-11 22:23:27','2025-09-11 22:23:27'),(11,'Layla Smitham','schulist.jamey',NULL,'2025-09-11 22:23:28','2025-09-11 22:23:28'),(12,'Rico Ankunding','loyal.welch','Et tempora quisquam unde impedit officia cupiditate soluta.','2025-09-11 22:23:29','2025-09-11 22:23:29'),(13,'Stacey Hermiston PhD','francesca.lang',NULL,'2025-09-11 22:23:29','2025-09-11 22:23:29'),(14,'atmin','atmin','pembaik','2025-09-14 20:55:20','2025-09-14 20:55:20');
+/*!40000 ALTER TABLE `admins` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cache`
+--
+
+DROP TABLE IF EXISTS `cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cache` (
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cache`
+--
+
+LOCK TABLES `cache` WRITE;
+/*!40000 ALTER TABLE `cache` DISABLE KEYS */;
+/*!40000 ALTER TABLE `cache` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cache_locks`
+--
+
+DROP TABLE IF EXISTS `cache_locks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `cache_locks` (
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `expiration` int NOT NULL,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cache_locks`
+--
+
+LOCK TABLES `cache_locks` WRITE;
+/*!40000 ALTER TABLE `cache_locks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `cache_locks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `channels`
+--
+
+DROP TABLE IF EXISTS `channels`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `channels` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc` text COLLATE utf8mb4_unicode_ci,
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `channels`
+--
+
+LOCK TABLES `channels` WRITE;
+/*!40000 ALTER TABLE `channels` DISABLE KEYS */;
+INSERT INTO `channels` VALUES (1,'Stiedemann LLC','Quas molestias incidunt rerum fuga sapiente saepe ipsa doloribus.','http://www.kirlin.com/','2025-09-11 22:23:21','2025-09-11 22:23:21'),(2,'Blick, Treutel and Reinger','Asperiores cupiditate et temporibus perspiciatis.','http://lakin.com/sed-libero-nisi-optio-repellendus-ut-qui-eveniet.html','2025-09-11 22:23:21','2025-09-11 22:23:21'),(3,'Friesen LLC','Adipisci molestiae dignissimos voluptatibus officia libero.','http://kreiger.com/enim-eligendi-eos-magni-eligendi-in-explicabo-accusamus','2025-09-11 22:23:21','2025-09-11 22:23:21'),(4,'Wisoky-Murazik','Quia similique fugiat est harum.','https://www.wolf.com/tempore-et-repellat-at-voluptas-et-quia-est','2025-09-11 22:23:22','2025-09-11 22:23:22'),(5,'Satterfield-Ratke','Placeat et distinctio esse ipsam voluptas.','http://www.bahringer.org/dolorem-qui-qui-eveniet-eos-ut-sint-eos.html','2025-09-11 22:23:22','2025-09-11 22:23:22'),(6,'Schinner-Cremin','Voluptate illo illo repudiandae qui deserunt.','https://www.wilderman.com/iste-voluptates-quo-autem-nobis-eveniet-molestiae-doloribus','2025-09-11 22:23:24','2025-09-11 22:23:24'),(7,'Morissette, Daniel and Nicolas','Aliquid maiores et accusantium totam.','https://adams.org/quisquam-similique-dolorem-consequatur.html','2025-09-11 22:23:24','2025-09-11 22:23:24'),(8,'Kertzmann PLC','Et tenetur deserunt quas perferendis at fuga sint.','http://schultz.info/sit-voluptatum-quod-quos','2025-09-11 22:23:25','2025-09-11 22:23:25'),(9,'Rath Inc','Quis iure itaque voluptatem quis corrupti.','http://www.damore.com/','2025-09-11 22:23:26','2025-09-11 22:23:26'),(10,'Hartmann, Stehr and Macejkovic','Et iusto accusantium molestiae sint laudantium quaerat aut.','http://www.larson.com/ut-voluptas-et-delectus-vitae','2025-09-11 22:23:26','2025-09-11 22:23:26'),(11,'Spencer-Weissnat','Voluptatum et labore amet sint neque odio repellendus.','https://keebler.biz/ipsam-quia-eum-aut-officiis-quod.html','2025-09-11 22:23:26','2025-09-11 22:23:26'),(12,'Schmitt, Ankunding and Rutherford','Beatae nostrum quia itaque ut delectus sed.','https://www.durgan.com/asperiores-hic-dicta-sit-dolores-porro-laborum','2025-09-11 22:23:27','2025-09-11 22:23:27'),(13,'Moore Inc','Sit qui quisquam illum vel eius.','http://www.bechtelar.com/in-sit-est-atque-voluptatum-autem.html','2025-09-11 22:23:28','2025-09-11 22:23:28'),(14,'Kshlerin-Gaylord','Officia non natus minima.','http://smitham.biz/','2025-09-11 22:23:28','2025-09-11 22:23:28'),(15,'Cummings-Haley','Nihil quia ullam magnam praesentium.','http://www.schultz.com/temporibus-et-vel-autem-id.html','2025-09-11 22:23:29','2025-09-11 22:23:29'),(17,'yutub','ahd','https://youtube.com','2025-09-14 20:54:10','2025-09-14 20:54:10');
+/*!40000 ALTER TABLE `channels` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `customers`
+--
+
+DROP TABLE IF EXISTS `customers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `customers` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `customers_username_unique` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `customers`
+--
+
+LOCK TABLES `customers` WRITE;
+/*!40000 ALTER TABLE `customers` DISABLE KEYS */;
+INSERT INTO `customers` VALUES (1,'Brent Eichmann','cassandre39',NULL,'2025-09-11 22:23:19','2025-09-11 22:23:19'),(2,'Dr. Nathanael Ward DDS','carissa32',NULL,'2025-09-11 22:23:19','2025-09-11 22:23:19'),(3,'Miss Jenifer Gibson','mercedes.glover','Aut sapiente earum et sunt sed quis qui.','2025-09-11 22:23:20','2025-09-11 22:23:20'),(4,'Virginia Boehm','rdietrich',NULL,'2025-09-11 22:23:20','2025-09-11 22:23:20'),(5,'Myrl Vandervort','weimann.jarrell','Aut ratione provident aut iste dicta debitis.','2025-09-11 22:23:20','2025-09-11 22:23:20'),(6,'Dorthy Schulist','patience40',NULL,'2025-09-11 22:23:20','2025-09-11 22:23:20'),(7,'Maureen Reinger','roob.bria','Ut nisi voluptatibus ad commodi cum.','2025-09-11 22:23:20','2025-09-11 22:23:20'),(8,'Nya Schinner','damore.viviane','Voluptatem consequatur impedit iusto praesentium.','2025-09-11 22:23:21','2025-09-11 22:23:21'),(9,'Alvah Robel','marvin77','Rerum officia optio repellat minus.','2025-09-11 22:23:21','2025-09-11 22:23:21'),(10,'Mr. Gino Keebler','jo.schmitt','Unde voluptas id libero quam eius.','2025-09-11 22:23:21','2025-09-11 22:23:21'),(11,'Roosevelt Daugherty IV','zgerhold','Qui laborum non officia voluptas consequatur cum autem.','2025-09-11 22:23:24','2025-09-11 22:23:24'),(12,'Allene Jacobs','arielle.gaylord',NULL,'2025-09-11 22:23:24','2025-09-11 22:23:24'),(13,'Mr. German Turner','pamela01',NULL,'2025-09-11 22:23:25','2025-09-11 22:23:25'),(14,'Mr. Maurice Kuvalis','treutel.onie',NULL,'2025-09-11 22:23:25','2025-09-11 22:23:25'),(15,'Pearline Hamill','ozella.wintheiser',NULL,'2025-09-11 22:23:26','2025-09-11 22:23:26'),(16,'Dr. Javier Brakus MD','destany.tromp','Laudantium nam eveniet repellat quia aut et officiis.','2025-09-11 22:23:26','2025-09-11 22:23:26'),(17,'Mollie White PhD','alexzander49',NULL,'2025-09-11 22:23:27','2025-09-11 22:23:27'),(18,'Lisette Bartell','mmraz','Ut ducimus sed veniam ullam aut repellendus explicabo.','2025-09-11 22:23:27','2025-09-11 22:23:27'),(19,'Janessa Gaylord','savannah.predovic','Dolores fugit aperiam id qui doloremque ab aspernatur.','2025-09-11 22:23:28','2025-09-11 22:23:28'),(20,'Ms. Lilla Buckridge II','wisoky.roger','Pariatur ad qui et laboriosam.','2025-09-11 22:23:29','2025-09-11 22:23:29'),(21,'agus','gusss','hengsem','2025-09-14 20:53:05','2025-09-14 20:53:05');
+/*!40000 ALTER TABLE `customers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `failed_jobs`
+--
+
+DROP TABLE IF EXISTS `failed_jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `failed_jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `failed_jobs`
+--
+
+LOCK TABLES `failed_jobs` WRITE;
+/*!40000 ALTER TABLE `failed_jobs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `failed_jobs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `job_batches`
+--
+
+DROP TABLE IF EXISTS `job_batches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `job_batches` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `total_jobs` int NOT NULL,
+  `pending_jobs` int NOT NULL,
+  `failed_jobs` int NOT NULL,
+  `failed_job_ids` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `options` mediumtext COLLATE utf8mb4_unicode_ci,
+  `cancelled_at` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `finished_at` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `job_batches`
+--
+
+LOCK TABLES `job_batches` WRITE;
+/*!40000 ALTER TABLE `job_batches` DISABLE KEYS */;
+/*!40000 ALTER TABLE `job_batches` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `jobs`
+--
+
+DROP TABLE IF EXISTS `jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attempts` tinyint unsigned NOT NULL,
+  `reserved_at` int unsigned DEFAULT NULL,
+  `available_at` int unsigned NOT NULL,
+  `created_at` int unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `jobs_queue_index` (`queue`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `jobs`
+--
+
+LOCK TABLES `jobs` WRITE;
+/*!40000 ALTER TABLE `jobs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `jobs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `migrations`
+--
+
+DROP TABLE IF EXISTS `migrations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `migrations` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `migrations`
+--
+
+LOCK TABLES `migrations` WRITE;
+/*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
+INSERT INTO `migrations` VALUES (1,'0001_01_01_000000_create_users_table',1),(2,'0001_01_01_000001_create_cache_table',1),(3,'0001_01_01_000002_create_jobs_table',1),(4,'2025_09_11_144816_create_personal_access_tokens_table',1),(5,'2025_09_11_150000_create_customers_table',1),(6,'2025_09_11_150001_create_products_table',1),(7,'2025_09_11_150002_create_channels_table',1),(8,'2025_09_11_150003_create_payments_table',1),(9,'2025_09_11_150004_create_admins_table',1),(10,'2025_09_11_150005_create_sales_table',1);
+/*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+DROP TABLE IF EXISTS `password_reset_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `password_reset_tokens`
+--
+
+LOCK TABLES `password_reset_tokens` WRITE;
+/*!40000 ALTER TABLE `password_reset_tokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `password_reset_tokens` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `payments`
+--
+
+DROP TABLE IF EXISTS `payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `payments` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc` text COLLATE utf8mb4_unicode_ci,
+  `code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `payments`
+--
+
+LOCK TABLES `payments` WRITE;
+/*!40000 ALTER TABLE `payments` DISABLE KEYS */;
+INSERT INTO `payments` VALUES (1,'Cash','Cash payment','CASH','2025-09-11 22:23:22','2025-09-11 22:23:22'),(2,'Cash','Cash payment','CASH','2025-09-11 22:23:22','2025-09-11 22:23:22'),(3,'PayPal','PayPal payment','PP','2025-09-11 22:23:22','2025-09-11 22:23:22'),(4,'Cash','Cash payment','CASH','2025-09-11 22:23:22','2025-09-11 22:23:22'),(5,'Bank Transfer','Bank transfer payment','BT','2025-09-11 22:23:23','2025-09-11 22:23:23'),(6,'Cash','Cash payment','CASH','2025-09-11 22:23:24','2025-09-11 22:23:24'),(7,'Digital Wallet','Digital wallet payment','DW','2025-09-11 22:23:25','2025-09-11 22:23:25'),(8,'Credit Card','Credit card payment','CC','2025-09-11 22:23:25','2025-09-11 22:23:25'),(9,'Bank Transfer','Bank transfer payment','BT','2025-09-11 22:23:26','2025-09-11 22:23:26'),(10,'Credit Card','Credit card payment','CC','2025-09-11 22:23:26','2025-09-11 22:23:26'),(11,'Bank Transfer','Bank transfer payment','BT','2025-09-11 22:23:27','2025-09-11 22:23:27'),(12,'Credit Card','Credit card payment','CC','2025-09-11 22:23:27','2025-09-11 22:23:27'),(13,'Digital Wallet','Digital wallet payment','DW','2025-09-11 22:23:28','2025-09-11 22:23:28'),(14,'PayPal','PayPal payment','PP','2025-09-11 22:23:28','2025-09-11 22:23:28'),(15,'Bank Transfer','Bank transfer payment','BT','2025-09-11 22:23:29','2025-09-11 22:23:29'),(16,'duit','uang','cdvrg4t3','2025-09-14 23:10:10','2025-09-14 23:10:10'),(17,'duit11','uang11','222','2025-09-14 23:37:40','2025-09-14 23:37:40');
+/*!40000 ALTER TABLE `payments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `personal_access_tokens`
+--
+
+DROP TABLE IF EXISTS `personal_access_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_id` bigint unsigned NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `personal_access_tokens`
+--
+
+LOCK TABLES `personal_access_tokens` WRITE;
+/*!40000 ALTER TABLE `personal_access_tokens` DISABLE KEYS */;
+INSERT INTO `personal_access_tokens` VALUES (1,'App\\Models\\User',1,'API Token','c47db652eb61a3dd3cef7bec4e5f95f8732b16c1973a0c1e2c82cb98f8a33770','[\"*\"]','2025-09-11 21:41:40',NULL,'2025-09-11 21:21:24','2025-09-11 21:41:40'),(2,'App\\Models\\User',3,'API Token','a8108b41b3a37722ac64908b8246aedec8039b37aa0b901c771fe21e47d889d2','[\"*\"]','2025-09-11 23:23:40',NULL,'2025-09-11 22:24:23','2025-09-11 23:23:40'),(3,'App\\Models\\User',3,'API Token','a7b7d2c4923c252b02eba251a246e5a7189c507e529b13ae10ed34b68b039218','[\"*\"]','2025-09-12 00:23:31',NULL,'2025-09-11 23:33:49','2025-09-12 00:23:31'),(4,'App\\Models\\User',3,'API Token','8adab58bd56003233a26845f7f55fdbc7de615d0134d5160f29cda8f71ce8766','[\"*\"]',NULL,NULL,'2025-09-11 23:36:44','2025-09-11 23:36:44'),(6,'App\\Models\\User',3,'API Token','74da77f47e6a3bcf771dcbe35e1cd4b12e69f633ab0d8c82a91f27c9ec2e41d0','[\"*\"]',NULL,NULL,'2025-09-12 07:43:09','2025-09-12 07:43:09'),(7,'App\\Models\\User',3,'API Token','dfaeab1124770e2d20467b16fc3116bba2f62b145b9f3d997bacb12b36535cac','[\"*\"]',NULL,NULL,'2025-09-12 22:22:12','2025-09-12 22:22:12'),(8,'App\\Models\\User',3,'API Token','d164046c0f4b1bd27f677182cd863741c5acc1c265f7413ce0d6347dcc7dd659','[\"*\"]','2025-09-14 01:32:29',NULL,'2025-09-12 23:14:54','2025-09-14 01:32:29'),(9,'App\\Models\\User',3,'API Token','391a0fe02b0e0c881e76ac07c9bee5b745b5ffdf1021a2142b77821cf3dc3f40','[\"*\"]',NULL,NULL,'2025-09-14 01:33:41','2025-09-14 01:33:41'),(10,'App\\Models\\User',3,'API Token','c2b5adc828fadd8c7cdd1bdbb2c46a29084e13460900928a617eba3bc994e1ac','[\"*\"]','2025-09-15 00:41:28',NULL,'2025-09-14 01:33:55','2025-09-15 00:41:28');
+/*!40000 ALTER TABLE `personal_access_tokens` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `products`
+--
+
+DROP TABLE IF EXISTS `products`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `products` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sku` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `products`
+--
+
+LOCK TABLES `products` WRITE;
+/*!40000 ALTER TABLE `products` DISABLE KEYS */;
+INSERT INTO `products` VALUES (2,'ratione consequatur','books','FOU156780','2025-09-11 22:23:18','2025-09-11 22:23:18'),(3,'hic eaque','sports','ECS657474','2025-09-11 22:23:18','2025-09-11 22:23:18'),(4,'similique sed','food','HHL650465','2025-09-11 22:23:18','2025-09-11 22:23:18'),(5,'natus facere','home','DDA053063','2025-09-11 22:23:18','2025-09-11 22:23:18'),(6,'iste perferendis','electronics','WCO403487','2025-09-11 22:23:18','2025-09-11 22:23:18'),(7,'labore eligendi','sports','NWE468921','2025-09-11 22:23:19','2025-09-11 22:23:19'),(8,'quidem perspiciatis','sports','RLC518741','2025-09-11 22:23:19','2025-09-11 22:23:19'),(9,'non rem','books','NQZ122388','2025-09-11 22:23:19','2025-09-11 22:23:19'),(10,'odio quibusdam','sports','SMN380710','2025-09-11 22:23:19','2025-09-11 22:23:19'),(11,'et qui','sports','XXT033927','2025-09-11 22:23:24','2025-09-11 22:23:24'),(12,'enim dolore','electronics','MLF601279','2025-09-11 22:23:24','2025-09-11 22:23:24'),(13,'ex quia','food','UHB374199','2025-09-11 22:23:25','2025-09-11 22:23:25'),(14,'libero voluptatem','home','XVQ786730','2025-09-11 22:23:25','2025-09-11 22:23:25'),(15,'eos non','books','HQF033904','2025-09-11 22:23:26','2025-09-11 22:23:26'),(16,'deleniti natus','electronics','VXV975180','2025-09-11 22:23:26','2025-09-11 22:23:26'),(17,'repellat aut','food','HWJ855940','2025-09-11 22:23:27','2025-09-11 22:23:27'),(18,'tempora qui','sports','PIG677523','2025-09-11 22:23:28','2025-09-11 22:23:28'),(19,'voluptates voluptatibus','clothing','TKK666107','2025-09-11 22:23:28','2025-09-11 22:23:28'),(20,'earum eum','sports','IHJ980686','2025-09-11 22:23:29','2025-09-11 22:23:29'),(21,'bidji','kue','aihdwok','2025-09-14 20:53:40','2025-09-14 20:53:40');
+/*!40000 ALTER TABLE `products` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sales`
+--
+
+DROP TABLE IF EXISTS `sales`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sales` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `customer_id` bigint unsigned NOT NULL,
+  `product_id` bigint unsigned NOT NULL,
+  `channel_id` bigint unsigned NOT NULL,
+  `payment_id` bigint unsigned NOT NULL,
+  `admin_id` bigint unsigned NOT NULL,
+  `price` decimal(15,2) NOT NULL,
+  `link` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `date` date NOT NULL,
+  `ship_date` date DEFAULT NULL,
+  `note` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sales_customer_id_foreign` (`customer_id`),
+  KEY `sales_product_id_foreign` (`product_id`),
+  KEY `sales_channel_id_foreign` (`channel_id`),
+  KEY `sales_payment_id_foreign` (`payment_id`),
+  KEY `sales_admin_id_foreign` (`admin_id`),
+  CONSTRAINT `sales_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `sales_channel_id_foreign` FOREIGN KEY (`channel_id`) REFERENCES `channels` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `sales_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `sales_payment_id_foreign` FOREIGN KEY (`payment_id`) REFERENCES `payments` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `sales_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sales`
+--
+
+LOCK TABLES `sales` WRITE;
+/*!40000 ALTER TABLE `sales` DISABLE KEYS */;
+INSERT INTO `sales` VALUES (1,11,11,6,6,4,396.86,'http://www.torphy.biz/eaque-nobis-distinctio-explicabo-explicabo-quasi.html','1971-09-06','2010-05-17',NULL,'2025-09-11 22:23:29','2025-09-11 22:23:29'),(2,12,12,7,7,5,557.75,'http://howe.com/in-ea-eveniet-excepturi-porro-quam-architecto-sit-id','1991-03-14',NULL,'Velit quia magnam consequatur et et.','2025-09-11 22:23:30','2025-09-11 22:23:30'),(3,13,13,8,8,6,931.55,NULL,'2023-10-16',NULL,NULL,'2025-09-11 22:23:30','2025-09-11 22:23:30'),(4,14,14,9,9,7,799.49,NULL,'2009-08-14','1991-02-21','Autem neque enim et ut laboriosam eius veniam.','2025-09-11 22:23:30','2025-09-11 22:23:30'),(5,15,15,10,10,8,690.51,'http://treutel.biz/','2013-02-15','1974-03-09',NULL,'2025-09-11 22:23:30','2025-09-11 22:23:30'),(6,16,16,11,11,9,498.58,NULL,'1970-10-29',NULL,'Nisi dolor distinctio ipsum maxime fuga autem omnis.','2025-09-11 22:23:30','2025-09-11 22:23:30'),(7,17,17,12,12,10,959.69,NULL,'1988-12-05','1988-06-05',NULL,'2025-09-11 22:23:30','2025-09-11 22:23:30'),(8,18,18,13,13,11,145.49,NULL,'1998-05-15',NULL,NULL,'2025-09-11 22:23:30','2025-09-11 22:23:30'),(9,19,19,14,14,12,437.19,'https://www.crist.com/ut-quibusdam-sunt-laudantium-porro-consequatur-nemo','2025-07-17',NULL,'Ipsa itaque labore commodi ipsa minus provident quod.','2025-09-11 22:23:30','2025-09-11 22:23:30'),(10,20,20,15,15,13,346.20,'http://www.skiles.com/ullam-ab-nisi-a-numquam-eos-exercitationem.html','1991-08-21','1994-01-18','Sint libero est eos laudantium.','2025-09-11 22:23:30','2025-09-11 22:23:30'),(12,4,4,2,3,9,9000.00,NULL,'2025-09-15','2025-09-15','mbud','2025-09-14 22:56:09','2025-09-14 22:56:09'),(13,5,6,4,4,9,7700.00,'https://www.crist.com/ut-quibusdam-sunt-laudantium-porro-consequatur-nemo','2025-09-09','2025-09-23','g','2025-09-15 00:33:12','2025-09-15 00:33:12'),(14,2,3,2,2,9,7700.00,'https://www.crist.com/ut-quibusdam-sunt-laudantium-porro-consequatur-nemo','2025-09-14','2025-09-09','n','2025-09-15 00:35:22','2025-09-15 00:36:18');
+/*!40000 ALTER TABLE `sales` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sessions`
+--
+
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sessions` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint unsigned DEFAULT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_activity` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sessions_user_id_index` (`user_id`),
+  KEY `sessions_last_activity_index` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sessions`
+--
+
+LOCK TABLES `sessions` WRITE;
+/*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
+INSERT INTO `sessions` VALUES ('255eC5mInUqzwINhQEHeAbGlaA3wlbpgKFJGQszt',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiY3FkdTl1Y2NjaDVlTUxlTE04QlFLQ2hPSm5PMnFUaDBFa2QzcDRMUCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757739556),('2XGPaf8jslsRjU6y2yIIpBlXOzxR6RHR6o9zwYSy',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoidzM3NE01eDkyRlBQbGhVc3duYW9pUlFTRzZ6bHpLRXlrcDZwQmtzbyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685081),('3snsaBiUWkXjSh28GkZNovRhryb5sA78REAsxUDj',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiSlJmdENwc0RJVEdBYXFqTVR6b1A3cU9QN0pub3hBdUNNUWpRSWZRTyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685370),('6uqbaZAdYfLqXmRx9Efjm9jc57O6kgUbPwLGv5xR',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoieGxyN1gxRDljYldJOHZMS1hwZE5RTXB2SGh2SHpCWWp0M21xYWp0VSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685701),('7c4gQYESM76VM2QBVavTtAvLEMgO8ktXkEPO2AYW',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiUlp1dGJXc1labGtnVkV0UTlHUEtBNHV0MXZXTThiSDlPalZheDZabCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685227),('8WSJ0itBdpYAqQhogDih3i3HAjRgQCjhpSFED8Oh',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiSUZzM25XQVZHUVVSTHNTWlVTa1pzVVl6aG5weXRnZnRFdXNFUWJ5dCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hcGkvc2FuY3R1bS9jc3JmLWNvb2tpZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1757685736),('A3N4D3HZuJ2HnWKFbRkMymDqmAaDNKyYkjbKMXPu',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiOHQ2TGROcUZIU0Q5R0k0YzFBQW83am9HbjZJbVhlaWloa04yZnB1SiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hcGkvc2FuY3R1bS9jc3JmLWNvb2tpZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1757685684),('a8L01B0kEBFnBgW8Gkb4G1kMcJjSwIaObk4DEUuL',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiT3pUell5aUtYbml3cDdZYTdQV0lCSjJsMFR4WTc1R2xnOVczbVhVUiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685376),('AzNtJcthafTxAL7SxJSty6DYZ58UHG6W0XuoOxqx',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiek55WGtyOTZabXR6WXRUcmlQZWdOTTZOVmVMR3ZyWmJyVFF6czJhOSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9zYW5jdHVtL2NzcmYtY29va2llIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757739553),('bcBKJbog5LJmKmow9IKCrYkQ0Rd1uSmAqQxuUUx7',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoidlFQZ1hMSkYwOVR2cUlrZXRPUjdoR3gwVnVHZDlyOFBhbzdqeWtuZSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757688634),('bdUSTdaX07LxeUVfRy3mIu9TRq72uqsV3QlqZrOM',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiaWswUTZJZElWUWZPVDZnSEROeWJ5VEw2S0lTSkZZZmVsc3NXaXh0eSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hcGkvc2FuY3R1bS9jc3JmLWNvb2tpZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1757685886),('DDEnJMV5rZiYSNc1sTUM46lvpQTbGGHphbT1YM7P',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiZlBVT1RzVHdrbnBxR0tNeTB1cXZzMXRWcGl3YVJNbzR6U2FQWDJXWiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757688369),('dgBIlbwowYYjtYPztJLYs5bl9DD8j97USfzL3X2q',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoianhkazllWVJPbzRPb3ZJTnRHblhQSVpRdjZjTXQzdEladjVCajhzcSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9zYW5jdHVtL2NzcmYtY29va2llIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757739080),('EWJ88LA2REJI8PY7fIYpnnmRDfmUqcgcjCeqRb9W',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiR1QzWnFvb0tsMVZGOTB0MkF3Tm9oaEFyNHlNc3FianlZcFBpcHlsbiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685888),('EwMQ4a61EpeTdIvhgd6vCyszIvFI4yxsxL7ZWWG2',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiNUd1bEZtaTgzYWpkSXA2UHZGUlhFOTVnUGp3ckpoMFdibW5tS1ZJNCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9zYW5jdHVtL2NzcmYtY29va2llIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757739063),('F7gyskQ2To7T0iERyGssLHTjlkEGOlw370g7sXYv',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoic3BIdHlvMjA1WXp2VHJ1WFZ3OFVteFRRTlpLaWtrckJDNHFIbXpuUyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685741),('Fq8rvsS4MP9ttKiSk2l7febWZ9DFodLdTVBe8D2K',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiaGpCM3FyZ1U4OFpxSWNyb0JOM0FDQW5Zd2x6bGFGMU9xZFJjdGdFOSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757738394),('hxCUVxLZFdn3gK2wE3XCTPx0TAkAMribDdBV0eG7',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiTFVXTGcweUJJbVM4ckt6QnZpa3VDY2hyZjNKUnNxeFpQcHJwTWNRUiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757738390),('JRpYz6xFyBGggpE67cND5Iu4JBuV6PjsT7iGyqTo',NULL,'::1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiV3l4bzVqQlo3cTV6a2NNU3VlWENFaExWcWN3NEdxTDJNaEpmbzVkaCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDU6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9hcGkvc2FuY3R1bS9jc3JmLWNvb2tpZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1757686608),('JvXrn9hPLxfb0mk5b7br00pY7X1qbeyrrNMmisAx',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiWnhsRk9mVU5ISk1EQlpIVXQwZ2RxNEpIeU94VXlmVnJDc0JPUzNiRyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757738342),('koVk8OVMwXcKfQozAbFTPXDTrZONAu6BJfmW6A31',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiVlZ5RVZTS2JReDl6MVhBTWMzMDZnb1RBcmNyNFV4dXU4Nmw5Sld5QyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685390),('lLvRK4J4EmrUh4ZeSs89TDx6SWcLYHNWSz2sr2Kc',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiWHBKeUZUVThtNE50RFJGUWdVU09lQllHMUVQZFJ1cU15WmlZVjJhZiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hcGkvc2FuY3R1bS9jc3JmLWNvb2tpZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1757685697),('LQOttVlmu4M9N3200ZycPjKOEXkzmBrsQfuJ5Neo',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiMGk4cm1DcDF2ajFlQnhXUUZ6a2ZHY0N3ZTZ0cGhybjdJbjNJWWVhTSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hcGkvc2FuY3R1bS9jc3JmLWNvb2tpZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1757685890),('mOQtkDWfvrrX7RDLHdhVbymkIy4ehrMOdAtJAtSo',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YTozOntzOjY6Il90b2tlbiI7czo0MDoiUFM1VzJlcWYySks3dVpyd3laOHMxWVNuVkVJYnZSOFJTem00NWR1aCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hcGkvc2FuY3R1bS9jc3JmLWNvb2tpZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1757685679),('MOXS5TE1QExMlGkIAb3qNJYPoOXmOkAA9LrFBbBk',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiYXFndEk1YkVDNmRVU1VOUHJOVGZLbVhkUktjM0NJaktpQnVRSlA3NCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685681),('pGzvxYbmfGBwEwrmxweOXqF5OWjmAUDxDBEvtrdw',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiVVo1d1VJbjY3cUJWYnQwN3N6UUNPNmxNdXp5a1FKSGdZckk1YUprQSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685393),('r9BUzpWIc9AqNQ4Z5GoB3xdezj7NOB3ZyepgagpV',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiT1l4TDVjRTF0MXVwdXhVbkhQZmViYzd6VVBTeTBOYlFsVlpQMWZKRyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685090),('rMnytPb64tkyv2zCyB33ED0cDk2Ad7bzTc8mmXQw',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiM0hCMmFId0JtSENJcm9nRkszTEFuQnNhdnJ0WEZ5MzZ2eGREU0NhTCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757689397),('skH5n3iq8SvM6KEVTIHORgioDQw2EhF88CpIwOSm',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiUlFYQjlHQXFVY0ltM2o0Nm4zTXZrdEwxR1l1enloOTloOEt5UFNHVSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685891),('uCGikvuwUXljnjk1fUNdFUezQpfvdlnExEaTFaHi',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiaVBkckxOQzRLdEdiTktjdWJQUTlFcTF5d2lkaXRhbUhkUEdPaEpoYSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757689392),('vmyWthLI2hS5lQjxpP4cQhiq7PqOPEY8zRqjyKzT',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiWW1zUjA5MDFCNTNLbFlNVG1KeUsyaEZ5UTYzQVhsTXREZnJCazlHYSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757738385),('VpOgBqQq4GTUfU6xZwiZes70rhg2GWHwfynAg39O',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiYTVFV3V0RFAzbzlLQko3N25pcEYySmNtdmw0eUZWaTBxclRTZ2tQQyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757688376),('xTjE0ID9af40oIpLnqtjNmPcnCQGAYcDGVODVZ6C',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiTTRlakFBODJxVUFWTjhLdFRWcmw4RFpvQkhHTjIzSHlmNFA1TWRWcSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757685685),('y1edhk2n2nJDC7gcnbc8oYaVAGIR8jSDIJyuoG2v',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36','YToyOntzOjY6Il90b2tlbiI7czo0MDoiWTZzVFJzb29Yb1dZQnphdklTY0NzUnhYV21LeTBwelFabzhGOVc4MCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==',1757689154),('y53PyIhWjAFzvv5EsclhRkTt6r4chgtFoFNNTSSt',3,'127.0.0.1','PostmanRuntime/7.46.0','YTozOntzOjY6Il90b2tlbiI7czo0MDoiN0pUS21XV1Bma1lzNXg2dzNIY1NwMFR1eTFRY3YxTUpCc1FsREhBNyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=',1757662107);
+/*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_username_unique` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (3,'Test User','testuser','$2y$12$ohtplbFirs5wj2mqSecgVuR48W688u5oY.yVO.l3a/S1zgMBD/fEm','jVud996RwT','2025-09-11 22:23:17','2025-09-11 22:23:17');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-09-15 14:50:06

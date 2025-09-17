@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/contexts/ThemeContext';
 import { useData } from '@/hooks/useData';
-import { Store, ShoppingCart, Users, Package, Route, CreditCard, Settings, Zap, Download, RotateCcw, Sun, Moon, LogOut, BarChart3, FileText } from 'lucide-react';
+import { Store, ShoppingCart, Users, Package, Route, CreditCard, Settings, BarChart3, FileText, Cog } from 'lucide-react';
 import { toast } from 'sonner';
 import Dashboard from './Dashboard';
 import SalesManager from './SalesManager';
@@ -12,8 +11,9 @@ import ChannelManager from './ChannelManager';
 import PaymentManager from './PaymentManager';
 import AdminManager from './AdminManager';
 import Reports from './Reports';
+import SettingsComponent from './Settings';
 
-type ActiveTab = 'dashboard' | 'penjualan' | 'pelanggan' | 'produk' | 'channel' | 'pembayaran' | 'admin' | 'laporan';
+type ActiveTab = 'dashboard' | 'penjualan' | 'pelanggan' | 'produk' | 'channel' | 'pembayaran' | 'admin' | 'laporan' | 'settings';
 
 interface POSAppProps {
   onLogout: () => void;
@@ -21,26 +21,12 @@ interface POSAppProps {
 
 const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
-  const { theme, toggleTheme } = useTheme();
-  const { loadDemoData, resetAllData, exportData } = useData();
+  const { exportData } = useData();
 
-  const handleDemoLoad = () => {
-    loadDemoData();
-    toast.success('Data demo berhasil dimuat!');
-  };
-
-  const handleReset = () => {
-    if (window.confirm('Hapus semua data? Tindakan ini tidak dapat dibatalkan.')) {
-      resetAllData();
-      toast.success('Semua data telah dihapus.');
-    }
-  };
-
-  const handleExport = () => {
-    exportData();
+  const handleExport = (options?: { sections?: string[] }) => {
+    exportData(options);
     toast.success('Data berhasil diekspor!');
   };
-
 
   const handleLogout = () => {
     if (window.confirm('Yakin ingin logout?')) {
@@ -58,7 +44,8 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
     { id: 'channel', label: 'Channel', component: Route },
     { id: 'pembayaran', label: 'Metode Bayar', component: CreditCard },
     { id: 'admin', label: 'Admin', component: Settings },
-    { id: 'laporan', label: 'Laporan', component: FileText }
+    { id: 'laporan', label: 'Laporan', component: FileText },
+    { id: 'settings', label: 'Pengaturan', component: Cog }
   ] as const;
 
   return (
@@ -76,7 +63,7 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
               </div>
             </div>
           </div>
-          
+
           {/* Navigation - Mobile Responsive */}
           <nav className="flex flex-col gap-4">
             {/* Navigation Tabs */}
@@ -97,45 +84,8 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
                 );
               })}
             </div>
-            
-            {/* Toolbar - Mobile Responsive */}
-            <div className="flex gap-2 justify-between items-center">
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleDemoLoad} title="Muat data contoh">
-                  <Zap className="h-4 w-4" />
-                  <span className="hidden md:inline ml-2">Demo</span>
-                </Button>
-                <Button variant="outline" size="sm" onClick={handleExport} title="Ekspor semua data">
-                  <Download className="h-4 w-4" />
-                  <span className="hidden md:inline ml-2">Ekspor</span>
-                </Button>
-                <Button variant="destructive" size="sm" onClick={handleReset} title="Hapus semua data">
-                  <RotateCcw className="h-4 w-4" />
-                  <span className="hidden md:inline ml-2">Reset</span>
-                </Button>
-              </div>
-              
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleTheme}
-                  title="Toggle tema"
-                >
-                  {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleLogout}
-                  title="Logout"
-                  className="text-xs sm:text-sm"
-                >
-                  <LogOut className="h-4 w-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Logout</span>
-                </Button>
-              </div>
-            </div>
+
+
           </nav>
         </div>
       </header>
@@ -150,6 +100,7 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
         {activeTab === 'pembayaran' && <PaymentManager />}
         {activeTab === 'admin' && <AdminManager />}
         {activeTab === 'laporan' && <Reports />}
+        {activeTab === 'settings' && <SettingsComponent onLogout={handleLogout} onExport={handleExport} />}
       </main>
     </div>
   );
