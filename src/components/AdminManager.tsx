@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,21 +18,18 @@ import {
 } from "@/components/ui/dialog";
 
 const AdminManager: React.FC = () => {
-  const { admins, addAdmin, updateAdmin, deleteAdmin, fetchAdmins } = useData();
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [filteredAdmins, setFilteredAdmins] = React.useState(admins);
+  const { admins, addAdmin, updateAdmin, deleteAdmin, refetchAdmins } = useData();
 
-  React.useEffect(() => {
-    setFilteredAdmins(
-      admins.filter(admin => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-          admin.name.toLowerCase().includes(searchLower) ||
-          (admin.username && admin.username.toLowerCase().includes(searchLower)) ||
-          (admin.note && admin.note.toLowerCase().includes(searchLower))
-        );
-      })
-    );
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const filteredAdmins = useMemo(() => {
+    return admins.filter(admin => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        admin.name.toLowerCase().includes(searchLower) ||
+        (admin.username && admin.username.toLowerCase().includes(searchLower)) ||
+        (admin.note && admin.note.toLowerCase().includes(searchLower))
+      );
+    })
   }, [admins, searchTerm]);
 
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
@@ -111,12 +108,17 @@ const AdminManager: React.FC = () => {
     }
   };
 
+  const handleRefresh = () => {
+    refetchAdmins();
+    toast.success('Data admin diperbarui');
+  };
+
   return (
     <div className="space-y-4 md:space-y-6 animate-fade-in px-4 md:px-0">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl md:text-3xl font-bold text-gradient">Data Admin</h1>
         <div className="flex gap-2">
-          <Button onClick={fetchAdmins} variant="outline" className="w-full sm:w-auto">
+          <Button onClick={handleRefresh} variant="outline" className="w-full sm:w-auto">
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>

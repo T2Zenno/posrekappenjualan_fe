@@ -110,11 +110,11 @@ const Reports: React.FC = () => {
     return Array.from(map.entries()).map(([name, data]) => ({ name, ...data }));
   };
 
-  const channelStats = aggregateBy(sale => sale.channel?.name || '-');
+  const channelStats = aggregateBy(sale => sale.channel?.name || 'N/A');
 
-  const productStats = aggregateBy(sale => sale.product?.name || '-');
+  const productStats = aggregateBy(sale => sale.product?.name || 'N/A');
 
-  const adminStats = aggregateBy(sale => sale.admin?.name || '-');
+  const adminStats = aggregateBy(sale => sale.admin?.name || 'N/A');
 
   const handleExportPDF = () => {
     const exportData = {

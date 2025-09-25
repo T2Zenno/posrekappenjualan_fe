@@ -6,7 +6,9 @@ import { Card } from "@/components/ui/card";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import { Textarea } from "@/components/ui/textarea";
 
-import { useData, type Sale } from '@/hooks/useData';
+import {
+  useData, type Sale
+} from '@/hooks/useData';
 import { formatCurrency, getTodayString, parseDate, isDateBetween } from '@/utils/formatters';
 
 // Helper function to get safe price
@@ -35,7 +37,7 @@ const SalesManager: React.FC = () => {
     customers, products, channels, payments, admins, sales,
     addSale, updateSale, deleteSale,
     addCustomer, addProduct, addChannel, addPayment, addAdmin,
-    fetchSales
+    refetchSales
   } = useData();
 
   // Create options for comboboxes
@@ -307,7 +309,7 @@ const SalesManager: React.FC = () => {
           {editingSale ? 'Edit Transaksi Penjualan' : 'Tambah Transaksi Penjualan'}
         </h1>
         <div className="flex gap-2">
-          <Button onClick={fetchSales} variant="outline" className="w-full sm:w-auto">
+          <Button onClick={() => refetchSales()} variant="outline" className="w-full sm:w-auto">
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>

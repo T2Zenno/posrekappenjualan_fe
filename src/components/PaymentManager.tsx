@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,21 +18,17 @@ import {
 } from "@/components/ui/dialog";
 
 const PaymentManager: React.FC = () => {
-  const { payments, addPayment, updatePayment, deletePayment, fetchPayments } = useData();
+  const { payments, addPayment, updatePayment, deletePayment, refetchPayments } = useData();
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [filteredPayments, setFilteredPayments] = React.useState(payments);
-
-  React.useEffect(() => {
-    setFilteredPayments(
-      payments.filter(payment => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-          payment.name.toLowerCase().includes(searchLower) ||
-          (payment.desc && payment.desc.toLowerCase().includes(searchLower)) ||
-          (payment.code && payment.code.toLowerCase().includes(searchLower))
-        );
-      })
-    );
+  const filteredPayments = useMemo(() => {
+    return payments.filter(payment => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        payment.name.toLowerCase().includes(searchLower) ||
+        (payment.desc && payment.desc.toLowerCase().includes(searchLower)) ||
+        (payment.code && payment.code.toLowerCase().includes(searchLower))
+      );
+    })
   }, [payments, searchTerm]);
 
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
@@ -92,7 +88,7 @@ const PaymentManager: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    fetchPayments();
+    refetchPayments();
     toast.success('Data pembayaran diperbarui');
   };
 

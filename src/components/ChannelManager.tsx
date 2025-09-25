@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,22 +18,18 @@ import {
 } from "@/components/ui/dialog";
 
 const ChannelManager: React.FC = () => {
-  const { channels, addChannel, updateChannel, deleteChannel, fetchChannels } = useData();
+  const { channels, addChannel, updateChannel, deleteChannel, refetchChannels } = useData();
 
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [filteredChannels, setFilteredChannels] = React.useState(channels);
-
-  React.useEffect(() => {
-    setFilteredChannels(
-      channels.filter(channel => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-          channel.name.toLowerCase().includes(searchLower) ||
-          (channel.desc && channel.desc.toLowerCase().includes(searchLower)) ||
-          (channel.url && channel.url.toLowerCase().includes(searchLower))
-        );
-      })
-    );
+  const filteredChannels = useMemo(() => {
+    return channels.filter(channel => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        channel.name.toLowerCase().includes(searchLower) ||
+        (channel.desc && channel.desc.toLowerCase().includes(searchLower)) ||
+        (channel.url && channel.url.toLowerCase().includes(searchLower))
+      );
+    })
   }, [channels, searchTerm]);
 
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
@@ -113,7 +109,7 @@ const ChannelManager: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    fetchChannels();
+    refetchChannels();
     toast.success('Data channel diperbarui');
   };
 

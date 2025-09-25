@@ -69,41 +69,71 @@ export interface SaleInput {
 
 
 
-// Fetch functions for React Query
+// Fetch functions (diekspor agar bisa digunakan di komponen)
 const fetchCustomers = async (): Promise<Customer[]> => {
   try {
-    const response = await api.get('/customers');
-    // Asumsi backend mengembalikan data dalam properti `data`
-    return response.data.data || [];
+    const response = await api.get< Customer[] >('/customers');
+    return response.data || [];
   } catch (error: any) {
-    // Axios akan melempar error untuk status non-2xx
-    throw new Error(error.response?.data?.message || 'Gagal mengambil data pelanggan');
+    const message = error.response?.data?.message || 'Gagal mengambil data pelanggan';
+    toast.error(message);
+    throw new Error(message);
   }
 };
 
 const fetchProducts = async (): Promise<Product[]> => {
-  const response = await api.get('/products');
-  return response.data.data || [];
+  try {
+    const response = await api.get< Product[]>('/products');
+     return response.data || [];
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Gagal mengambil data produk';
+    toast.error(message);
+    throw new Error(message);
+  }
 };
 
 const fetchChannels = async (): Promise<Channel[]> => {
-  const response = await api.get('/channels');
-  return response.data.data || [];
+  try {
+    const response = await api.get< Channel[] >('/channels');
+     return response.data || [];
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Gagal mengambil data channel';
+    toast.error(message);
+    throw new Error(message);
+  }
 };
 
 const fetchPayments = async (): Promise<Payment[]> => {
-  const response = await api.get('/payments');
-  return response.data.data || [];
+  try {
+    const response = await api.get< Payment[] >('/payments');
+     return response.data || [];
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Gagal mengambil data pembayaran';
+    toast.error(message);
+    throw new Error(message);
+  }
 };
 
 const fetchAdmins = async (): Promise<Admin[]> => {
-  const response = await api.get('/admins');
-  return response.data.data || [];
+  try {
+    const response = await api.get< Admin[] >('/admins');
+     return response.data || [];
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Gagal mengambil data admin';
+    toast.error(message);
+    throw new Error(message);
+  }
 };
 
 const fetchSales = async (): Promise<Sale[]> => {
-  const response = await api.get('/sales');
-  return response.data.data || [];
+  try {
+    const response = await api.get< Sale[] >('/sales');
+     return response.data || [];
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Gagal mengambil data penjualan';
+    toast.error(message);
+    throw new Error(message);
+  }
 };
 
 // Custom hook for data management
@@ -151,8 +181,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Produk berhasil ditambahkan');
     },
-    onError: () => {
-      toast.error('Gagal menambahkan produk');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menambahkan produk');
     },
   });
 
@@ -169,8 +199,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Produk berhasil diperbarui');
     },
-    onError: () => {
-      toast.error('Gagal memperbarui produk');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal memperbarui produk');
     },
   });
 
@@ -188,8 +218,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       toast.success('Produk berhasil dihapus');
     },
-    onError: () => {
-      toast.error('Gagal menghapus produk');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menghapus produk');
     },
   });
 
@@ -203,8 +233,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast.success('Pelanggan berhasil ditambahkan');
     },
-    onError: () => {
-      toast.error('Gagal menambahkan pelanggan');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menambahkan pelanggan');
     },
   });
 
@@ -221,8 +251,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast.success('Pelanggan berhasil diperbarui');
     },
-    onError: () => {
-      toast.error('Gagal memperbarui pelanggan');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal memperbarui pelanggan');
     },
   });
 
@@ -239,8 +269,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast.success('Pelanggan berhasil dihapus');
     },
-    onError: () => {
-      toast.error('Gagal menghapus pelanggan');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menghapus pelanggan');
     },
   });
 
@@ -254,8 +284,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['channels'] });
       toast.success('Channel berhasil ditambahkan');
     },
-    onError: () => {
-      toast.error('Gagal menambahkan channel');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menambahkan channel');
     },
   });
 
@@ -271,8 +301,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['channels'] });
       toast.success('Channel berhasil diperbarui');
     },
-    onError: () => {
-      toast.error('Gagal memperbarui channel');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal memperbarui channel');
     },
   });
 
@@ -289,8 +319,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['channels'] });
       toast.success('Channel berhasil dihapus');
     },
-    onError: () => {
-      toast.error('Gagal menghapus channel');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menghapus channel');
     },
   });
 
@@ -304,8 +334,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       toast.success('Pembayaran berhasil ditambahkan');
     },
-    onError: () => {
-      toast.error('Gagal menambahkan pembayaran');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menambahkan pembayaran');
     },
   });
 
@@ -322,8 +352,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       toast.success('Pembayaran berhasil diperbarui');
     },
-    onError: () => {
-      toast.error('Gagal memperbarui pembayaran');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal memperbarui pembayaran');
     },
   });
 
@@ -340,8 +370,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
       toast.success('Pembayaran berhasil dihapus');
     },
-    onError: () => {
-      toast.error('Gagal menghapus pembayaran');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menghapus pembayaran');
     },
   });
 
@@ -355,8 +385,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
       toast.success('Admin berhasil ditambahkan');
     },
-    onError: () => {
-      toast.error('Gagal menambahkan admin');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menambahkan admin');
     },
   });
 
@@ -373,8 +403,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
       toast.success('Admin berhasil diperbarui');
     },
-    onError: () => {
-      toast.error('Gagal memperbarui admin');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal memperbarui admin');
     },
   });
 
@@ -391,8 +421,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
       toast.success('Admin berhasil dihapus');
     },
-    onError: () => {
-      toast.error('Gagal menghapus admin');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menghapus admin');
     },
   });
 
@@ -406,8 +436,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       toast.success('Penjualan berhasil ditambahkan');
     },
-    onError: () => {
-      toast.error('Gagal menambahkan penjualan');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menambahkan penjualan');
     },
   });
 
@@ -424,8 +454,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       toast.success('Penjualan berhasil diperbarui');
     },
-    onError: () => {
-      toast.error('Gagal memperbarui penjualan');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal memperbarui penjualan');
     },
   });
 
@@ -442,8 +472,8 @@ export const useData = () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       toast.success('Penjualan berhasil dihapus');
     },
-    onError: () => {
-      toast.error('Gagal menghapus penjualan');
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Gagal menghapus penjualan');
     },
   });
 
@@ -457,18 +487,18 @@ export const useData = () => {
   }, []);
 
   const exportData = useCallback(async (options?: { sections?: string[] }) => {
-    const data = {
-      sales: salesQuery.data || [],
-      customers: customersQuery.data || [],
-      products: productsQuery.data || [],
-      channels: channelsQuery.data || [],
-      payments: paymentsQuery.data || [],
-      admins: adminsQuery.data || []
-    };
-
     try {
+      const dataToExport = {
+        sales: salesQuery.data || [],
+        customers: customersQuery.data || [],
+        products: productsQuery.data || [],
+        channels: channelsQuery.data || [],
+        payments: paymentsQuery.data || [],
+        admins: adminsQuery.data || []
+      };
+
       const { exportToPDF } = await import('@/utils/pdfExporter');
-      exportToPDF(data, {
+      exportToPDF(dataToExport, {
         title: 'Laporan Data POS & Rekap Penjualan',
         sections: options?.sections
       });
@@ -477,17 +507,16 @@ export const useData = () => {
       console.error('Export failed:', error);
       toast.error('Gagal mengekspor data');
     }
-  }, [salesQuery.data, customersQuery.data, productsQuery.data, channelsQuery.data, paymentsQuery.data, adminsQuery.data]);
+  }, [queryClient, salesQuery.data, customersQuery.data, productsQuery.data, channelsQuery.data, paymentsQuery.data, adminsQuery.data]);
 
   return {
     // Data
-    customers: customersQuery.data || [],
-    products: productsQuery.data || [],
-    channels: channelsQuery.data || [],
-    payments: paymentsQuery.data || [],
-    admins: adminsQuery.data || [],
-    sales: salesQuery.data || [],
-
+    customers: customersQuery.data ?? [],
+    products: productsQuery.data ?? [],
+    channels: channelsQuery.data ?? [],
+    payments: paymentsQuery.data ?? [],
+    admins: adminsQuery.data ?? [],
+    sales: salesQuery.data ?? [],
     // Customer operations
     addCustomer: addCustomerMutation.mutateAsync,
     updateCustomer: updateCustomerMutation.mutateAsync,
@@ -523,12 +552,12 @@ export const useData = () => {
     resetAllData,
     exportData,
 
-    // Fetch functions for refresh
-    fetchCustomers,
-    fetchProducts,
-    fetchChannels,
-    fetchPayments,
-    fetchAdmins,
-    fetchSales,
+    // Refetch functions
+    refetchCustomers: customersQuery.refetch,
+    refetchProducts: productsQuery.refetch,
+    refetchChannels: channelsQuery.refetch,
+    refetchPayments: paymentsQuery.refetch,
+    refetchAdmins: adminsQuery.refetch,
+    refetchSales: salesQuery.refetch,
   };
 };

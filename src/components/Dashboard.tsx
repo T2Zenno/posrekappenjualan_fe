@@ -1,19 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
-import { useData } from '@/hooks/useData';
+import {
+  useData
+} from '@/hooks/useData';
 import { formatCurrency } from '@/utils/formatters';
 import { Package, DollarSign, TrendingUp, Route, RefreshCw } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
-  const { sales, customers, products, channels, payments, admins, fetchSales } = useData();
+  const { sales, channels, refetchSales } = useData();
+  console.log('Fetched sales:', sales);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchSales();
+      refetchSales();
     }, 10000); // 10 seconds
 
     return () => clearInterval(interval);
-  }, [fetchSales]);
+  }, [refetchSales]);
 
   // Helper function to get safe price
   const getSafePrice = (price: number | string | null | undefined) => {
@@ -38,19 +41,23 @@ const Dashboard: React.FC = () => {
   };
 
   // Calculate KPIs
-  const totalOrders = sales.length;
-  const totalRevenue = sales.reduce((sum, sale) => sum + getSafePrice(sale.price), 0);
-  const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  const { totalOrders, totalRevenue, averageOrderValue, topChannel } = useMemo(() => {
+    const totalOrders = sales.length;
+    const totalRevenue = sales.reduce((sum, sale) => sum + getSafePrice(sale.price), 0);
+    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-  // Get top channel by revenue
-  const channelRevenue = sales.reduce((acc, sale) => {
-    const channelName = sale.channel?.name || 'Unknown';
-    acc[channelName] = (acc[channelName] || 0) + getSafePrice(sale.price);
-    return acc;
-  }, {} as Record<string, number>);
+    // Get top channel by revenue
+    const channelRevenue = sales.reduce((acc, sale) => { // sale.channel can be null if data is inconsistent
+      const channelName = sale.channel?.name || 'Unknown';
+      acc[channelName] = (acc[channelName] || 0) + getSafePrice(sale.price);
+      return acc;
+    }, {} as Record<string, number>);
 
-  const maxIncome = Math.max(...Object.values(channelRevenue));
-  const topChannel = Object.keys(channelRevenue).find(name => channelRevenue[name] === maxIncome) || 'Unknown';
+    const maxIncome = Math.max(...Object.values(channelRevenue));
+    const topChannel = Object.keys(channelRevenue).find(name => channelRevenue[name] === maxIncome) || 'Unknown';
+
+    return { totalOrders, totalRevenue, averageOrderValue, topChannel };
+  }, [sales]);
 
   // Last 7 days data
   const now = new Date();
@@ -92,7 +99,7 @@ const Dashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gradient">Dashboard Monitoring</h1>
         <button
-          onClick={fetchSales}
+          onClick={() => refetchSales()}
           className="flex items-center gap-2 bg-gradient-primary text-white px-4 py-2 rounded-md"
           title="Refresh"
         >

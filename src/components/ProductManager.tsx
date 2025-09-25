@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,13 +18,10 @@ import {
 } from "@/components/ui/dialog";
 
 const ProductManager: React.FC = () => {
-  const { products, addProduct, updateProduct, deleteProduct, fetchProducts } = useData();
+  const { products, addProduct, updateProduct, deleteProduct, refetchProducts } = useData();
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [filteredProducts, setFilteredProducts] = React.useState(products);
-
-  React.useEffect(() => {
-    setFilteredProducts(
-      products.filter(product => {
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
         const searchLower = searchTerm.toLowerCase();
         return (
           product.name.toLowerCase().includes(searchLower) ||
@@ -32,7 +29,6 @@ const ProductManager: React.FC = () => {
           (product.sku && product.sku.toLowerCase().includes(searchLower))
         );
       })
-    );
   }, [products, searchTerm]);
 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -112,7 +108,7 @@ const ProductManager: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    fetchProducts();
+    refetchProducts();
     toast.success('Data produk diperbarui');
   };
 

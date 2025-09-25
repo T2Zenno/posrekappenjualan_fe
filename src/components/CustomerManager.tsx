@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,24 +8,18 @@ import { toast } from "sonner";
 import { Save, RotateCcw, Edit, Trash2, RefreshCw } from 'lucide-react';
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
-  DialogFooter,
   DialogTitle,
   DialogDescription,
-  DialogClose,
 } from "@/components/ui/dialog";
 
 const CustomerManager: React.FC = () => {
-  const { customers, addCustomer, updateCustomer, deleteCustomer, fetchCustomers } = useData();
+  const { customers, addCustomer, updateCustomer, deleteCustomer, refetchCustomers } = useData();
 
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [filteredCustomers, setFilteredCustomers] = React.useState(customers);
-
-  React.useEffect(() => {
-    setFilteredCustomers(
-      customers.filter(customer => {
+  const filteredCustomers = useMemo(() => {
+    return customers.filter(customer => {
         const searchLower = searchTerm.toLowerCase();
         return (
           customer.name.toLowerCase().includes(searchLower) ||
@@ -33,7 +27,6 @@ const CustomerManager: React.FC = () => {
           (customer.note && customer.note.toLowerCase().includes(searchLower))
         );
       })
-    );
   }, [customers, searchTerm]);
 
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -99,7 +92,7 @@ const CustomerManager: React.FC = () => {
   };
 
   const handleRefresh = () => {
-    fetchCustomers();
+    refetchCustomers();
     toast.success('Data pelanggan diperbarui');
   };
 
