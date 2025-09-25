@@ -35,15 +35,6 @@ const PaymentManager: React.FC = () => {
     );
   }, [payments, searchTerm]);
 
-  useEffect(() => {
-    fetchPayments();
-    const interval = setInterval(() => {
-      fetchPayments();
-    }, 10000); // 10 seconds
-
-    return () => clearInterval(interval);
-  }, [fetchPayments]);
-
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
   const [formData, setFormData] = useState({
     name: '',

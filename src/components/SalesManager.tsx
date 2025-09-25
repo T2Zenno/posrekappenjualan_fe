@@ -88,21 +88,6 @@ const SalesManager: React.FC = () => {
     note: ''
   });
 
-  useEffect(() => {
-    fetchSales();
-
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        fetchSales();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [fetchSales]);
-
   // Filtered sales
   const filteredSales = useMemo(() => {
     return sales.filter(sale => {

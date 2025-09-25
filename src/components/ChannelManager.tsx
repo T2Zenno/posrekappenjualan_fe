@@ -36,10 +36,6 @@ const ChannelManager: React.FC = () => {
     );
   }, [channels, searchTerm]);
 
-  useEffect(() => {
-    fetchChannels();
-  }, [fetchChannels]);
-
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [formData, setFormData] = useState({
     name: '',

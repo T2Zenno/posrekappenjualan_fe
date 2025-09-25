@@ -6,12 +6,14 @@ import { Card } from "@/components/ui/card";
 import { useTheme } from '@/contexts/ThemeContext';
 import { Sun, Moon, Shield } from 'lucide-react';
 import { toast } from "sonner";
+import api from '@/lib/axios';
 
 interface LoginFormProps {
-  onLogin: (isAuthenticated: boolean) => void;
+  onLogin: (isAuthenticated: boolean) => void; 
+  onNavigateToRegister: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onNavigateToRegister }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [ingatSaya, setIngatSaya] = useState(false);
@@ -23,17 +25,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      // Since APIs are now public, skip backend login and directly authenticate
-      localStorage.setItem('pos-authenticated', 'true');
+      const response = await api.post('/login', { username, password });
+      const data = response.data;
+      // Asumsi API mengembalikan token dan data user
+      localStorage.setItem('pos-authenticated', 'true'); // Tandai pengguna sebagai terautentikasi
+      localStorage.setItem('pos-auth-token', data.token); // Simpan token jika ada
+      localStorage.setItem('pos-user-data', JSON.stringify(data.user)); // Simpan data user jika ada
+      console.log('User data:', data.user);
+
       if (ingatSaya) {
         localStorage.setItem('pos-remember', 'true');
+        localStorage.setItem('pos-user-data', JSON.stringify(data.user)); // Simpan data user juga jika "Ingat Saya" aktif
       } else {
         localStorage.removeItem('pos-remember');
       }
       onLogin(true);
-      toast.success('Login berhasil! Selamat datang di POS System');
+      toast.success(data.message || 'Login berhasil! Selamat datang di POS System');
     } catch (error: any) {
-      toast.error('Terjadi kesalahan saat login');
+      toast.error(error.response?.data?.message || 'Login gagal. Periksa username dan password Anda.');
     } finally {
       setLoading(false);
     }
@@ -110,6 +119,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
               {loading ? 'Memverifikasi...' : 'Masuk'}
             </Button>
           </form>
+
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Belum punya akun? <Button variant="link" onClick={onNavigateToRegister} className="p-0 h-auto text-primary hover:text-primary-hover">Daftar di sini</Button>
+          </p>
 
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground text-center">

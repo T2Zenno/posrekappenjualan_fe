@@ -8,11 +8,13 @@ import { useState, useEffect } from "react";
 import { Store } from "lucide-react";
 import LoginForm from "@/components/LoginForm";
 import POSApp from "@/components/POSApp";
+import RegisterForm from "@/components/RegisterForm";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => {
+  const [view, setView] = useState<'login' | 'register'>('login');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,6 +31,7 @@ const App = () => {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    setView('login');
   };
 
   if (isLoading) {
@@ -50,8 +53,14 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          {!isAuthenticated ? (
-            <LoginForm onLogin={handleLogin} />
+          {!isAuthenticated ? ( 
+            view === 'login' ? (
+              <LoginForm onLogin={handleLogin} onNavigateToRegister={() => setView('register')} />
+            ) : (
+              <RegisterForm 
+                onRegister={() => setView('login')} 
+                onNavigateToLogin={() => setView('login')} />
+            )
           ) : (
             <BrowserRouter>
               <Routes>

@@ -36,10 +36,6 @@ const CustomerManager: React.FC = () => {
     );
   }, [customers, searchTerm]);
 
-  useEffect(() => {
-    fetchCustomers();
-  }, [fetchCustomers]);
-
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [formData, setFormData] = useState({
     name: '',

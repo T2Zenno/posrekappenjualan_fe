@@ -43,10 +43,6 @@ const ProductManager: React.FC = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 

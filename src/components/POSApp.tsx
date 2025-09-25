@@ -13,6 +13,7 @@ import PaymentManager from './PaymentManager';
 import AdminManager from './AdminManager';
 import Reports from './Reports';
 import SettingsComponent from './Settings';
+import api from '@/lib/axios';
 
 type ActiveTab = 'dashboard' | 'penjualan' | 'pelanggan' | 'produk' | 'channel' | 'pembayaran' | 'admin' | 'laporan' | 'settings';
 
@@ -30,11 +31,23 @@ const POSApp: React.FC<POSAppProps> = ({ onLogout }) => {
     toast.success('Data berhasil diekspor!');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (window.confirm('Yakin ingin logout?')) {
-      localStorage.removeItem('pos-authenticated');
-      onLogout();
-      toast.success('Berhasil logout.');
+      try {
+        await api.post('/logout');
+
+        // Tidak perlu memeriksa response.ok secara ketat untuk logout,
+        // karena kita tetap ingin menghapus state lokal bahkan jika API gagal
+        // (misalnya, token sudah kadaluarsa di server).
+      } catch (error: any) {
+        console.error("Logout API call failed, but logging out locally.", error.response?.data?.message || error.message);
+      } finally {
+        localStorage.removeItem('pos-authenticated');
+        localStorage.removeItem('pos-auth-token');
+        localStorage.removeItem('pos-user-data');
+        onLogout();
+        toast.success('Berhasil logout.');
+      }
     }
   };
 

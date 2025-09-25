@@ -43,21 +43,6 @@ const AdminManager: React.FC = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchAdmins();
-
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        fetchAdmins();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [fetchAdmins]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 

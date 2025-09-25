@@ -1,3 +1,4 @@
+import api from '@/lib/axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
@@ -65,73 +66,44 @@ export interface SaleInput {
   note: string;
 }
 
-// Base API URL
-const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
-const getAuthHeaders = () => {
-  // Removed token usage as Sanctum is no longer used
-  return {};
-};
 
-// Fetch CSRF cookie
-const fetchCsrfCookie = async () => {
-  // Removed Sanctum CSRF cookie fetch as Sanctum is no longer used
-  return;
-};
 
 // Fetch functions for React Query
 const fetchCustomers = async (): Promise<Customer[]> => {
-  const res = await fetch(`${API_BASE}/customers`, {
-    headers: getAuthHeaders(),
-    credentials: 'include'
-  });
-  if (!res.ok) throw new Error('Failed to fetch customers');
-  return res.json();
+  try {
+    const response = await api.get('/customers');
+    // Asumsi backend mengembalikan data dalam properti `data`
+    return response.data.data || [];
+  } catch (error: any) {
+    // Axios akan melempar error untuk status non-2xx
+    throw new Error(error.response?.data?.message || 'Gagal mengambil data pelanggan');
+  }
 };
 
 const fetchProducts = async (): Promise<Product[]> => {
-  const res = await fetch(`${API_BASE}/products`, {
-    headers: getAuthHeaders(),
-    credentials: 'include'
-  });
-  if (!res.ok) throw new Error('Failed to fetch products');
-  return res.json();
+  const response = await api.get('/products');
+  return response.data.data || [];
 };
 
 const fetchChannels = async (): Promise<Channel[]> => {
-  const res = await fetch(`${API_BASE}/channels`, {
-    headers: getAuthHeaders(),
-    credentials: 'include'
-  });
-  if (!res.ok) throw new Error('Failed to fetch channels');
-  return res.json();
+  const response = await api.get('/channels');
+  return response.data.data || [];
 };
 
 const fetchPayments = async (): Promise<Payment[]> => {
-  const res = await fetch(`${API_BASE}/payments`, {
-    headers: getAuthHeaders(),
-    credentials: 'include'
-  });
-  if (!res.ok) throw new Error('Failed to fetch payments');
-  return res.json();
+  const response = await api.get('/payments');
+  return response.data.data || [];
 };
 
 const fetchAdmins = async (): Promise<Admin[]> => {
-  const res = await fetch(`${API_BASE}/admins`, {
-    headers: getAuthHeaders(),
-    credentials: 'include'
-  });
-  if (!res.ok) throw new Error('Failed to fetch admins');
-  return res.json();
+  const response = await api.get('/admins');
+  return response.data.data || [];
 };
 
 const fetchSales = async (): Promise<Sale[]> => {
-  const res = await fetch(`${API_BASE}/sales`, {
-    headers: getAuthHeaders(),
-    credentials: 'include'
-  });
-  if (!res.ok) throw new Error('Failed to fetch sales');
-  return res.json();
+  const response = await api.get('/sales');
+  return response.data.data || [];
 };
 
 // Custom hook for data management
@@ -172,14 +144,8 @@ export const useData = () => {
   // CRUD operations for Product using useMutation
   const addProductMutation = useMutation({
     mutationFn: async (product: Omit<Product, 'id'>) => {
-      const res = await fetch(`${API_BASE}/products`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(product),
-      });
-      if (!res.ok) throw new Error('Failed to add product');
-      return res.json();
+      const response = await api.post('/products', product);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -196,14 +162,8 @@ export const useData = () => {
         console.error('ID is undefined for update product');
         return;
       }
-      const res = await fetch(`${API_BASE}/products/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(product),
-      });
-      if (!res.ok) throw new Error('Failed to update product');
-      return res.json();
+      const response = await api.put(`/products/${id}`, product);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -220,12 +180,8 @@ export const useData = () => {
         console.error('ID is undefined for delete product');
         return;
       }
-      const res = await fetch(`${API_BASE}/products/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to delete product');
+      const response = await api.delete(`/products/${id}`);
+      if (response.status !== 200 && response.status !== 204) throw new Error('Failed to delete product');
       return id;
     },
     onSuccess: () => {
@@ -240,14 +196,8 @@ export const useData = () => {
   // CRUD operations for Customer using useMutation
   const addCustomerMutation = useMutation({
     mutationFn: async (customer: Omit<Customer, 'id'>) => {
-      const res = await fetch(`${API_BASE}/customers`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(customer),
-      });
-      if (!res.ok) throw new Error('Failed to add customer');
-      return res.json();
+      const response = await api.post('/customers', customer);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
@@ -264,14 +214,8 @@ export const useData = () => {
         console.error('ID is undefined for update customer');
         return;
       }
-      const res = await fetch(`${API_BASE}/customers/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(customer),
-      });
-      if (!res.ok) throw new Error('Failed to update customer');
-      return res.json();
+      const response = await api.put(`/customers/${id}`, customer);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
@@ -288,13 +232,8 @@ export const useData = () => {
         console.error('ID is undefined for delete customer');
         return;
       }
-      const res = await fetch(`${API_BASE}/customers/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to delete customer');
-      return id;
+      await api.delete(`/customers/${id}`);
+      return id; // Return id on success
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
@@ -308,14 +247,8 @@ export const useData = () => {
   // CRUD operations for Channel using useMutation
   const addChannelMutation = useMutation({
     mutationFn: async (channel: Omit<Channel, 'id'>) => {
-      const res = await fetch(`${API_BASE}/channels`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(channel),
-      });
-      if (!res.ok) throw new Error('Failed to add channel');
-      return res.json();
+      const response = await api.post('/channels', channel);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['channels'] });
@@ -331,14 +264,8 @@ export const useData = () => {
       if (!id) {
         throw new Error('ID is undefined for update channel');
       }
-      const res = await fetch(`${API_BASE}/channels/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(channel),
-      });
-      if (!res.ok) throw new Error('Failed to update channel');
-      return res.json();
+      const response = await api.put(`/channels/${id}`, channel);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['channels'] });
@@ -355,13 +282,8 @@ export const useData = () => {
         console.error('ID is undefined for delete channel');
         return;
       }
-      const res = await fetch(`${API_BASE}/channels/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to delete channel');
-      return id;
+      await api.delete(`/channels/${id}`);
+      return id; // Return id on success
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['channels'] });
@@ -375,14 +297,8 @@ export const useData = () => {
   // CRUD operations for Payment using useMutation
   const addPaymentMutation = useMutation({
     mutationFn: async (payment: Omit<Payment, 'id'>) => {
-      const res = await fetch(`${API_BASE}/payments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(payment),
-      });
-      if (!res.ok) throw new Error('Failed to add payment');
-      return res.json();
+      const response = await api.post('/payments', payment);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
@@ -399,14 +315,8 @@ export const useData = () => {
         console.error('ID is undefined for update payment');
         return;
       }
-      const res = await fetch(`${API_BASE}/payments/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(payment),
-      });
-      if (!res.ok) throw new Error('Failed to update payment');
-      return res.json();
+      const response = await api.put(`/payments/${id}`, payment);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
@@ -423,13 +333,8 @@ export const useData = () => {
         console.error('ID is undefined for delete payment');
         return;
       }
-      const res = await fetch(`${API_BASE}/payments/${id}`, {
-        method: 'DELETE',
-        headers: { 'Accept': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to delete payment');
-      return id;
+      await api.delete(`/payments/${id}`);
+      return id; // Return id on success
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
@@ -443,14 +348,8 @@ export const useData = () => {
   // CRUD operations for Admin using useMutation
   const addAdminMutation = useMutation({
     mutationFn: async (admin: Omit<Admin, 'id'>) => {
-      const res = await fetch(`${API_BASE}/admins`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(admin),
-      });
-      if (!res.ok) throw new Error('Failed to add admin');
-      return res.json();
+      const response = await api.post('/admins', admin);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
@@ -467,14 +366,8 @@ export const useData = () => {
         console.error('ID is undefined for update admin');
         return;
       }
-      const res = await fetch(`${API_BASE}/admins/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(admin),
-      });
-      if (!res.ok) throw new Error('Failed to update admin');
-      return res.json();
+      const response = await api.put(`/admins/${id}`, admin);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
@@ -491,13 +384,8 @@ export const useData = () => {
         console.error('ID is undefined for delete admin');
         return;
       }
-      const res = await fetch(`${API_BASE}/admins/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to delete admin');
-      return id;
+      await api.delete(`/admins/${id}`);
+      return id; // Return id on success
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
@@ -511,14 +399,8 @@ export const useData = () => {
   // CRUD operations for Sale using useMutation
   const addSaleMutation = useMutation({
     mutationFn: async (sale: SaleInput) => {
-      const res = await fetch(`${API_BASE}/sales`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(sale),
-      });
-      if (!res.ok) throw new Error('Failed to add sale');
-      return res.json();
+      const response = await api.post('/sales', sale);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
@@ -535,14 +417,8 @@ export const useData = () => {
         console.error('ID is undefined for update sale');
         return;
       }
-      const res = await fetch(`${API_BASE}/sales/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-        body: JSON.stringify(sale),
-      });
-      if (!res.ok) throw new Error('Failed to update sale');
-      return res.json();
+      const response = await api.put(`/sales/${id}`, sale);
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
@@ -559,13 +435,8 @@ export const useData = () => {
         console.error('ID is undefined for delete sale');
         return;
       }
-      const res = await fetch(`${API_BASE}/sales/${id}`, {
-        method: 'DELETE',
-        headers: { 'Accept': 'application/json', ...getAuthHeaders() },
-        credentials: 'include',
-      });
-      if (!res.ok) throw new Error('Failed to delete sale');
-      return id;
+      await api.delete(`/sales/${id}`);
+      return id; // Return id on success
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
