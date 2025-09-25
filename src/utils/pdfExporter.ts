@@ -28,6 +28,13 @@ const getId = (value: any): string => {
   return typeof value === 'object' && value ? value.id : value;
 };
 
+// Helper function to safely get the array from a potential { data: [...] } object structure
+const getArray = <T>(input: any): T[] => {
+  if (Array.isArray(input)) return input;
+  if (input && Array.isArray(input.data)) return input.data;
+  return [];
+};
+
 export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
   const doc = new jsPDF();
 
@@ -57,8 +64,15 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
   let yPosition = options.dateRange ? 55 : 50;
 
   // Statistics
-  const totalOrders = data.sales.length;
-  const totalRevenue = data.sales.reduce((sum, sale) => sum + (sale.price || 0), 0);
+  const salesArray = getArray<Sale>(data.sales);
+  const customersArray = getArray<Customer>(data.customers);
+  const productsArray = getArray<Product>(data.products);
+  const channelsArray = getArray<Channel>(data.channels);
+  const paymentsArray = getArray<Payment>(data.payments);
+  const adminsArray = getArray<Admin>(data.admins);
+
+  const totalOrders = salesArray.length;
+  const totalRevenue = salesArray.reduce((sum, sale) => sum + (sale.price || 0), 0);
   const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
   doc.setFontSize(14);
@@ -76,18 +90,18 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
   yPosition += 15;
 
   // Sales table (only if sales are included or no sections specified)
-  if (data.sales.length > 0 && (!options.sections || options.sections.includes('penjualan'))) {
+  if (salesArray.length > 0 && (!options.sections || options.sections.includes('penjualan'))) {
     doc.setFontSize(14);
     doc.setTextColor(40);
     doc.text('Detail Transaksi:', 20, yPosition);
     yPosition += 10;
 
-    const salesTableData = data.sales.map(sale => {
-      const customer = data.customers.find(c => c.id === getId(sale.customer));
-      const product = data.products.find(p => p.id === getId(sale.product));
-      const channel = data.channels.find(c => c.id === getId(sale.channel));
-      const payment = data.payments.find(p => p.id === getId(sale.payment));
-      const admin = data.admins.find(a => a.id === getId(sale.admin));
+    const salesTableData = salesArray.map(sale => {
+      const customer = customersArray.find(c => c.id === getId(sale.customer));
+      const product = productsArray.find(p => p.id === getId(sale.product));
+      const channel = channelsArray.find(c => c.id === getId(sale.channel));
+      const payment = paymentsArray.find(p => p.id === getId(sale.payment));
+      const admin = adminsArray.find(a => a.id === getId(sale.admin));
 
       return [
         formatDate(sale.date),
@@ -132,10 +146,10 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
   }
 
   // Summary by channel (only if sales are included)
-  if (data.sales.length > 0 && (!options.sections || options.sections.includes('penjualan'))) {
+  if (salesArray.length > 0 && (!options.sections || options.sections.includes('penjualan'))) {
     const channelStats = new Map();
-    data.sales.forEach(sale => {
-      const channel = data.channels.find(c => c.id === getId(sale.channel));
+    salesArray.forEach(sale => {
+      const channel = channelsArray.find(c => c.id === getId(sale.channel));
       const channelName = channel?.name || '-';
       const current = channelStats.get(channelName) || { orders: 0, revenue: 0 };
       current.orders += 1;
@@ -185,7 +199,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
   // Additional sections based on selected sections
   if (options.sections) {
     // Customers section
-    if (options.sections.includes('pelanggan') && data.customers.length > 0) {
+    if (options.sections.includes('pelanggan') && customersArray.length > 0) {
       if (yPosition > 200) {
         doc.addPage();
         yPosition = 30;
@@ -196,7 +210,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
       doc.text('Data Pelanggan:', 20, yPosition);
       yPosition += 10;
 
-      const customerTableData = data.customers.map(customer => [
+      const customerTableData = customersArray.map(customer => [
         customer.name,
         customer.username,
         customer.note || '-'
@@ -215,7 +229,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
     }
 
     // Products section
-    if (options.sections.includes('produk') && data.products.length > 0) {
+    if (options.sections.includes('produk') && productsArray.length > 0) {
       if (yPosition > 200) {
         doc.addPage();
         yPosition = 30;
@@ -226,7 +240,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
       doc.text('Data Produk:', 20, yPosition);
       yPosition += 10;
 
-      const productTableData = data.products.map(product => [
+      const productTableData = productsArray.map(product => [
         product.name,
         product.type,
         product.sku
@@ -245,7 +259,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
     }
 
     // Channels section
-    if (options.sections.includes('channel') && data.channels.length > 0) {
+    if (options.sections.includes('channel') && channelsArray.length > 0) {
       if (yPosition > 200) {
         doc.addPage();
         yPosition = 30;
@@ -256,7 +270,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
       doc.text('Data Channel:', 20, yPosition);
       yPosition += 10;
 
-      const channelTableData = data.channels.map(channel => [
+      const channelTableData = channelsArray.map(channel => [
         channel.name,
         channel.desc || '-',
         channel.url || '-'
@@ -275,7 +289,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
     }
 
     // Payments section
-    if (options.sections.includes('pembayaran') && data.payments.length > 0) {
+    if (options.sections.includes('pembayaran') && paymentsArray.length > 0) {
       if (yPosition > 200) {
         doc.addPage();
         yPosition = 30;
@@ -286,7 +300,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
       doc.text('Data Metode Pembayaran:', 20, yPosition);
       yPosition += 10;
 
-      const paymentTableData = data.payments.map(payment => [
+      const paymentTableData = paymentsArray.map(payment => [
         payment.name,
         payment.desc || '-',
         payment.code
@@ -305,7 +319,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
     }
 
     // Admins section
-    if (options.sections.includes('admin') && data.admins.length > 0) {
+    if (options.sections.includes('admin') && adminsArray.length > 0) {
       if (yPosition > 200) {
         doc.addPage();
         yPosition = 30;
@@ -316,7 +330,7 @@ export const exportToPDF = (data: ExportData, options: ExportOptions = {}) => {
       doc.text('Data Admin:', 20, yPosition);
       yPosition += 10;
 
-      const adminTableData = data.admins.map(admin => [
+      const adminTableData = adminsArray.map(admin => [
         admin.name,
         admin.username,
         admin.note || '-'

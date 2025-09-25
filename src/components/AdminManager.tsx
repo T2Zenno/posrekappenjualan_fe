@@ -2,9 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useData, type Admin } from '@/hooks/useData';
-import { toast } from "sonner";
 import { Save, RotateCcw, Edit, Trash2, RefreshCw } from 'lucide-react';
 import {
   Dialog,
@@ -14,11 +13,14 @@ import {
   DialogFooter,
   DialogTitle,
   DialogDescription,
-  DialogClose,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const AdminManager: React.FC = () => {
-  const { admins, addAdmin, updateAdmin, deleteAdmin, refetchAdmins } = useData();
+  const {
+    admins, addAdmin, updateAdmin, deleteAdmin, refetchAdmins,
+  } = useData();
+
 
   const [searchTerm, setSearchTerm] = React.useState('');
   const filteredAdmins = useMemo(() => {
@@ -39,8 +41,10 @@ const AdminManager: React.FC = () => {
     note: ''
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [adminToDelete, setAdminToDelete] = useState<Admin | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
@@ -54,15 +58,16 @@ const AdminManager: React.FC = () => {
       note: formData.note.trim()
     };
 
-    if (editingAdmin) {
-      updateAdmin({ id: editingAdmin.id, admin: adminData });
-      toast.success('Admin berhasil diperbarui');
-    } else {
-      addAdmin(adminData);
-      toast.success('Admin berhasil ditambahkan');
+    try {
+      if (editingAdmin) {
+        await updateAdmin({ id: editingAdmin.id, admin: adminData });
+      } else {
+        await addAdmin(adminData);
+      }
+      closeModal();
+    } catch (error) {
+      // Error sudah di-handle oleh react-query di useData
     }
-
-    closeModal();
   };
 
   const resetForm = () => {
@@ -92,20 +97,16 @@ const AdminManager: React.FC = () => {
     setFormData({ name: '', username: '', note: '' });
   };
 
-  const handleEdit = (admin: Admin) => {
-    setFormData({
-      name: admin.name,
-      username: admin.username,
-      note: admin.note
-    });
-    setEditingAdmin(admin);
+  const handleDeleteClick = (admin: Admin) => {
+    setAdminToDelete(admin);
+    setIsConfirmDeleteOpen(true);
   };
 
-  const handleDelete = (adminId: string) => {
-    if (window.confirm('Hapus admin ini?')) {
-      deleteAdmin(adminId);
-      toast.success('Admin berhasil dihapus');
-    }
+  const confirmDelete = async () => {
+    if (!adminToDelete) return;
+    await deleteAdmin(adminToDelete.id);
+    setIsConfirmDeleteOpen(false);
+    setAdminToDelete(null);
   };
 
   const handleRefresh = () => {
@@ -173,15 +174,34 @@ const AdminManager: React.FC = () => {
 
             <div className="md:col-span-3 flex flex-col sm:flex-row gap-3">
               <Button type="submit" className="bg-gradient-primary w-full sm:w-auto">
-                <Save className="h-4 w-4" />
+                <Save className="h-4 w-4 mr-2" />
                 {editingAdmin ? 'Perbarui' : 'Simpan'}
               </Button>
               <Button type="button" variant="outline" onClick={closeModal} className="w-full sm:w-auto">
-                <RotateCcw className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4 mr-2" />
                 Batal
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+            <DialogDescription>
+              Anda yakin ingin menghapus admin <strong>{adminToDelete?.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsConfirmDeleteOpen(false)}>Batal</Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Hapus
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -232,7 +252,7 @@ const AdminManager: React.FC = () => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleDelete(admin.id)}
+                          onClick={() => handleDeleteClick(admin)}
                           className="h-8 w-8 p-0"
                         >
                           <Trash2 className="h-3 w-3 md:h-4 md:w-4" />

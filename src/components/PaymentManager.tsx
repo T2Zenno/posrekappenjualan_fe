@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useData, type Payment } from '@/hooks/useData';
-import { toast } from "sonner";
 import { Save, RotateCcw, Edit, Trash2, RefreshCw } from 'lucide-react';
 import {
   Dialog,
@@ -16,9 +15,14 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const PaymentManager: React.FC = () => {
-  const { payments, addPayment, updatePayment, deletePayment, refetchPayments } = useData();
+  const {
+    payments, addPayment, updatePayment, deletePayment, refetchPayments,
+  } = useData();
+
+
   const [searchTerm, setSearchTerm] = React.useState('');
   const filteredPayments = useMemo(() => {
     return payments.filter(payment => {
@@ -38,8 +42,10 @@ const PaymentManager: React.FC = () => {
     code: ''
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
@@ -53,17 +59,14 @@ const PaymentManager: React.FC = () => {
       code: formData.code.trim()
     };
 
-    try {
-      if (editingPayment) {
-        await updatePayment({ id: editingPayment.id, payment: paymentData });
-      } else {
-        await addPayment(paymentData);
-      }
-      resetForm();
+    const action = editingPayment
+      ? updatePayment({ id: editingPayment.id, payment: paymentData })
+      : addPayment(paymentData);
+
+    action.then(() => {
       setIsModalOpen(false);
-    } catch (error) {
-      // Error is handled by the mutation's onError
-    }
+      resetForm();
+    });
   };
 
   const resetForm = () => {
@@ -80,12 +83,17 @@ const PaymentManager: React.FC = () => {
     setEditingPayment(payment);
   };
 
-  const handleDelete = (paymentId: string) => {
-    if (window.confirm('Hapus metode pembayaran ini?')) {
-      deletePayment(paymentId);
-      toast.success('Metode pembayaran berhasil dihapus');
-    }
+  const handleDeleteClick = (payment: Payment) => {
+    setPaymentToDelete(payment);
+    setIsConfirmDeleteOpen(true);
   };
+
+  const confirmDelete = async () => {
+    if (!paymentToDelete) return;
+    await deletePayment(paymentToDelete.id);
+    setIsConfirmDeleteOpen(false);
+    setPaymentToDelete(null);
+  }
 
   const handleRefresh = () => {
     refetchPayments();
@@ -152,15 +160,37 @@ const PaymentManager: React.FC = () => {
 
             <div className="md:col-span-3 flex flex-col sm:flex-row gap-3">
               <Button type="submit" className="bg-gradient-primary w-full sm:w-auto">
-                <Save className="h-4 w-4" />
+                <Save className="h-4 w-4 mr-2" />
                 {editingPayment ? 'Perbarui' : 'Simpan'}
               </Button>
               <Button type="button" variant="outline" onClick={() => { resetForm(); setIsModalOpen(false); }} className="w-full sm:w-auto">
-                <RotateCcw className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4 mr-2" />
                 Batal
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+            <DialogDescription>
+              Anda yakin ingin menghapus metode pembayaran <strong>{paymentToDelete?.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsConfirmDeleteOpen(false)}>Batal</Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Hapus
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -211,7 +241,7 @@ const PaymentManager: React.FC = () => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleDelete(payment.id)}
+                          onClick={() => handleDeleteClick(payment)}
                           className="h-8 w-8 p-0"
                         >
                           <Trash2 className="h-3 w-3 md:h-4 md:w-4" />

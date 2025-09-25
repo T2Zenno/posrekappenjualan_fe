@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useData, type Channel } from '@/hooks/useData';
-import { toast } from "sonner";
 import { Save, RotateCcw, Edit, Trash2, ExternalLink, Plus, RefreshCw } from 'lucide-react';
 import {
   Dialog,
@@ -16,9 +15,13 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const ChannelManager: React.FC = () => {
-  const { channels, addChannel, updateChannel, deleteChannel, refetchChannels } = useData();
+  const {
+    channels, addChannel, updateChannel, deleteChannel, refetchChannels,
+  } = useData();
+
 
   const [searchTerm, setSearchTerm] = React.useState('');
   const filteredChannels = useMemo(() => {
@@ -39,8 +42,10 @@ const ChannelManager: React.FC = () => {
     url: ''
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [channelToDelete, setChannelToDelete] = useState<Channel | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name.trim()) {
@@ -54,15 +59,16 @@ const ChannelManager: React.FC = () => {
       url: formData.url.trim()
     };
 
-    if (editingChannel) {
-      updateChannel({ id: editingChannel.id, channel: channelData });
-      toast.success('Channel berhasil diperbarui');
-    } else {
-      addChannel(channelData);
-      toast.success('Channel berhasil ditambahkan');
+    try {
+      if (editingChannel) {
+        await updateChannel({ id: editingChannel.id, channel: channelData });
+      } else {
+        await addChannel(channelData);
+      }
+      closeModal();
+    } catch (error) {
+      // Error sudah di-handle oleh react-query di useData
     }
-
-    closeModal();
   };
 
   const resetForm = () => {
@@ -101,12 +107,17 @@ const ChannelManager: React.FC = () => {
     setEditingChannel(channel);
   };
 
-  const handleDelete = (channelId: string) => {
-    if (window.confirm('Hapus channel ini?')) {
-      deleteChannel(channelId);
-      toast.success('Channel berhasil dihapus');
-    }
+  const handleDeleteClick = (channel: Channel) => {
+    setChannelToDelete(channel);
+    setIsConfirmDeleteOpen(true);
   };
+
+  const confirmDelete = async () => {
+    if (!channelToDelete) return;
+    await deleteChannel(channelToDelete.id);
+    setIsConfirmDeleteOpen(false);
+    setChannelToDelete(null);
+  }
 
   const handleRefresh = () => {
     refetchChannels();
@@ -175,15 +186,37 @@ const ChannelManager: React.FC = () => {
 
             <div className="md:col-span-3 flex flex-col sm:flex-row gap-3">
               <Button type="submit" className="bg-gradient-primary w-full sm:w-auto">
-                <Save className="h-4 w-4" />
+                <Save className="h-4 w-4 mr-2" />
                 {editingChannel ? 'Perbarui' : 'Simpan'}
               </Button>
               <Button type="button" variant="outline" onClick={closeModal} className="w-full sm:w-auto">
-                <RotateCcw className="h-4 w-4" />
+                <RotateCcw className="h-4 w-4 mr-2" />
                 Batal
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+            <DialogDescription>
+              Anda yakin ingin menghapus channel <strong>{channelToDelete?.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsConfirmDeleteOpen(false)}>Batal</Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Hapus
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -248,7 +281,7 @@ const ChannelManager: React.FC = () => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleDelete(channel.id)}
+                          onClick={() => handleDeleteClick(channel)}
                           className="h-8 w-8 p-0"
                         >
                           <Trash2 className="h-3 w-3 md:h-4 md:w-4" />

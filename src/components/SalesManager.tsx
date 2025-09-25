@@ -8,8 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 
 import {
   useData, type Sale
-} from '@/hooks/useData';
-import { formatCurrency, getTodayString, parseDate, isDateBetween } from '@/utils/formatters';
+} from "@/hooks/useData";
+import { formatCurrency, getTodayString, parseDate, isDateBetween, formatDate } from "@/utils/formatters";
 
 // Helper function to get safe price
 const getSafePrice = (price: number | string | null | undefined) => {
@@ -39,6 +39,10 @@ const SalesManager: React.FC = () => {
     addCustomer, addProduct, addChannel, addPayment, addAdmin,
     refetchSales
   } = useData();
+
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [saleToDelete, setSaleToDelete] = useState<Sale | null>(null);
+
 
   // Create options for comboboxes
   const customerOptions: ComboboxOption[] = customers.map(customer => ({
@@ -219,10 +223,10 @@ const SalesManager: React.FC = () => {
       payment_id: sale.payment.id,
       admin_id: sale.admin.id,
       price: sale.price.toString(),
-      link: sale.link,
-      date: sale.date,
-      ship_date: sale.ship_date,
-      note: sale.note
+      link: sale.link || '',
+      date: sale.date ? sale.date.slice(0, 10) : '',
+      ship_date: sale.ship_date ? sale.ship_date.slice(0, 10) : '',
+      note: sale.note || ''
     });
     setEditingSale(sale);
     setIsModalOpen(true);
@@ -253,20 +257,25 @@ const SalesManager: React.FC = () => {
       payment_id: sale.payment.id,
       admin_id: sale.admin.id,
       price: sale.price.toString(),
-      link: sale.link,
-      date: sale.date,
-      ship_date: sale.ship_date,
-      note: sale.note
+      link: sale.link || '',
+      date: sale.date ? sale.date.slice(0, 10) : '',
+      ship_date: sale.ship_date ? sale.ship_date.slice(0, 10) : '',
+      note: sale.note || ''
     });
     setEditingSale(sale);
   };
 
-  const handleDelete = (saleId: string) => {
-    if (window.confirm('Hapus transaksi ini?')) {
-      deleteSale(saleId);
-      toast.success('Transaksi berhasil dihapus');
-    }
+  const handleDeleteClick = (sale: Sale) => {
+    setSaleToDelete(sale);
+    setIsConfirmDeleteOpen(true);
   };
+
+  const confirmDelete = async () => {
+    if (!saleToDelete) return;
+    await deleteSale(saleToDelete.id);
+    setIsConfirmDeleteOpen(false);
+    setSaleToDelete(null);
+  }
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -412,7 +421,7 @@ const SalesManager: React.FC = () => {
 
                   return (
                     <tr key={sale.id} className="border-b border-border/30 hover:bg-accent/20">
-                      <td className="py-3 text-sm">{sale.date}</td>
+                      <td className="py-3 text-sm">{formatDate(sale.date)}</td>
                       <td className="py-3 text-sm">{customer?.name || '-'}</td>
                       <td className="py-3 text-sm">{product?.name || '-'}</td>
                       <td className="py-3 text-sm">
@@ -444,7 +453,7 @@ const SalesManager: React.FC = () => {
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => handleDelete(sale.id)}
+                            onClick={() => handleDeleteClick(sale)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -687,6 +696,27 @@ const SalesManager: React.FC = () => {
         onSubmit={handleQuickAdd}
         type={showQuickAdd.type}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+            <DialogDescription>
+              Anda yakin ingin menghapus transaksi untuk <strong>{saleToDelete?.customer?.name}</strong> pada tanggal <strong>{saleToDelete ? formatDate(saleToDelete.date) : ''}</strong>? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsConfirmDeleteOpen(false)}>Batal</Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

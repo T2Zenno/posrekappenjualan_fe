@@ -2,6 +2,14 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Download, LogOut, Sun, Moon } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { toast } from 'sonner';
 
 interface SettingsProps {
@@ -12,13 +20,12 @@ interface SettingsProps {
 const Settings: React.FC<SettingsProps> = ({ onLogout, onExport }) => {
   const { theme, toggleTheme } = useTheme();
   const [exportAll, setExportAll] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [selectedSections, setSelectedSections] = useState<string[]>([]);
 
   const handleLogout = () => {
-    if (window.confirm('Yakin ingin logout?')) {
-      onLogout();
-      toast.success('Berhasil logout.');
-    }
+    onLogout();
+    setIsLogoutConfirmOpen(false);
   };
 
   const handleExport = () => {
@@ -122,14 +129,30 @@ const Settings: React.FC<SettingsProps> = ({ onLogout, onExport }) => {
           Akun
         </h2>
         <Button
-          variant="outline"
-          onClick={handleLogout}
+          variant="destructive"
+          onClick={() => setIsLogoutConfirmOpen(true)}
           className="w-full flex items-center gap-2 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
         >
           <LogOut className="w-5 h-5" />
           Logout
         </Button>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={isLogoutConfirmOpen} onOpenChange={setIsLogoutConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Logout</DialogTitle>
+            <DialogDescription>
+              Anda yakin ingin keluar dari aplikasi?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsLogoutConfirmOpen(false)}>Batal</Button>
+            <Button variant="destructive" onClick={handleLogout}>Logout</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
