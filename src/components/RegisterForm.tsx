@@ -17,9 +17,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   onRegister,
   onNavigateToLogin,
 }) => {
-  const [username, setUsername] = useState("");
   const [name, setName] = useState("");
-  //   const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,17 +47,21 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       const response = await api.post('/register', {
-        username,
+        email,
         name,
+        phone,
         password,
         password_confirmation: passwordConfirmation
       });
 
+      // Simpan data autentikasi ke localStorage
+      localStorage.setItem("pos-authenticated", "true");
+      localStorage.setItem("pos-user-data", JSON.stringify(response.data.user));
+
       toast.success(
-        "Registrasi berhasil! Anda akan diarahkan ke halaman login."
+        "Registrasi berhasil! Anda akan langsung diarahkan ke halaman utama."
       );
       onRegister(true); // Memberi tahu komponen induk bahwa registrasi berhasil
-      onNavigateToLogin(); // Mengarahkan pengguna ke halaman login
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Terjadi kesalahan saat registrasi.");
       console.error("Registration error:", error.message);
@@ -99,32 +103,45 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nama Lengkap</Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Masukkan Nama"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="glass"
-              />
-            </div>
+            <Label htmlFor="name">Nama Lengkap</Label>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Masukkan Nama"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="glass"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                placeholder="Masukkan username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                className="glass"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Masukkan email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="glass"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone">No. Telepon</Label>
+            <Input
+              id="phone"
+              name="phone"
+              type="text"
+              placeholder="Masukkan nomor telepon"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="glass"
+            />
+          </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>

@@ -57,8 +57,12 @@ const App = () => {
             view === 'login' ? (
               <LoginForm onLogin={handleLogin} onNavigateToRegister={() => setView('register')} />
             ) : (
-              <RegisterForm 
-                onRegister={() => setView('login')} 
+            <RegisterForm 
+                onRegister={(isRegistered: boolean) => {
+                  if (isRegistered) {
+                    setIsAuthenticated(true);
+                  }
+                }} 
                 onNavigateToLogin={() => setView('login')} />
             )
           ) : (

@@ -17,7 +17,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   onLogin,
   onNavigateToRegister,
 }) => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [ingatSaya, setIngatSaya] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,22 +28,18 @@ const LoginForm: React.FC<LoginFormProps> = ({
     setLoading(true);
 
     try {
-      const response = await api.post("/login", { username, password });
+      const response = await api.post("/login", { email, password });
       const data = response.data;
 
-      // Jika backend balas error tapi tidak 2xx, axios otomatis masuk ke catch.
-      // Jadi pengecekan token hanya perlu jika login sukses.
-      if (data.token && data.user) {
+      // Jika login sukses (response 200), set authenticated
+      if (data.user) {
         localStorage.setItem("pos-authenticated", "true");
-        localStorage.setItem("pos-auth-token", data.token);
         localStorage.setItem("pos-user-data", JSON.stringify(data.user));
         if (ingatSaya) localStorage.setItem("pos-remember", "true");
         onLogin(true);
         toast.success("Login berhasil!");
       } else {
-        // kalau respon 200 tapi token/user kosong (misal backend ganti format)
         throw new Error("Respon login tidak valid");
-
       }
     } catch (error: any) {
       onLogin(false);
@@ -90,13 +86,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                placeholder="Masukkan username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="Masukkan email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="glass"
               />
